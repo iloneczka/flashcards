@@ -23,7 +23,7 @@
                 <a class="nav-link" href="{% url 'create_new_card' %}">Create New Card</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'import_cards' %}">Import Cards</a>
+                <a class="nav-link" href="{% url 'export_cards' %}">Export Cards</a>
               </li>
               <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -52,14 +52,6 @@
         {% block 'content' %}
         {% endblock %}
       </div>
-     
-      <script>
-        // Twój kod JavaScript
-        function showAlert() {
-          alert("Hello, this is a custom JavaScript function!");
-        }
-      </script>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </body>
 </html>

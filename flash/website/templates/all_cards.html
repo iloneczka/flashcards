@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 
 {% block 'content' %}
-  <h1>All Cards</h1>
-
+    <h1>All Cards</h1>
+    <br/>
+    <ul class="list-group">
+        {% regroup all_cards by box as box_grouped %}
+        {% for box in box_grouped %}
+            <li class="list-group-item">
+                <h2>🗃 Box {{ box.grouper }}</h2>
+                <ul>
+                    {% for card in box.list %}
+                        <li>
+                            <p>Question: {{ card.question }}</p>
+                            <p>Answer: {{ card.answer }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
