@@ -2,5 +2,26 @@
 
 {% block 'content' %}
   <h1>Create New Card</h1>
-
+  {% if added %}
+    <p>You added a new card:</p>
+    <p>Front Card: {{ question }}</p>
+    <p>Back Card: {{ answer }}</p>
+    <br/>
+  {% endif %}
+  <form action="{% url 'create_new_card' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="question" class="form-label">Question:</label>
+      <input type="text" class="form-control" id="question" placeholder="Front Card" name="question">
+    </div>
+    <br/>
+    <div class="form-group">
+      <label for="answer" class="form-label">Answer:</label>
+      <input type="text" class="form-control" id="answer" placeholder="Back Card" name="answer">
+    </div>
+    <br/>
+    <div class="d-grid gap-2">
+      <button class="btn btn-success" type="submit">Add</button>
+    </div>
+  </form>
 {% endblock %}
