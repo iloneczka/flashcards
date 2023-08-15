@@ -6,5 +6,6 @@ urlpatterns = [
     path('all_cards.html', views.all_cards, name="all_cards"),
     # path('' ,views.CardListView.as_view(), name="all_cards"),
     path('create_new_card.html', views.create_new_card, name="create_new_card"),
+    # path( "edit/<int:pk>", views.UpdateView.as_view(), name="card-update"),
     path('export_cards.html', views.export_cards, name="export_cards"),
 ]

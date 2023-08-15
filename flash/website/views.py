@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.views.generic import ListView
+from django.views.generic import (ListView, CreateView, UpdateView)
 from website.models import Card
+import random
 
 def home(request):
     return render(request, 'home.html', {})
@@ -15,8 +16,10 @@ def create_new_card(request):
     if request.method == "POST":
         answer = request.POST['answer']
         question = request.POST['question']
-        print(f"XXXXX {answer}")
-        return render(request, 'create_new_card.html', {'added': True, 'question': question, 'answer': answer})
+        box= request.POST['box']
+        card = Card(question=question, answer=answer, box=box)
+        card.save()
+        return render(request, 'create_new_card.html', {'added': True, 'question': question, 'answer': answer, 'box':box})
     return render(request, 'create_new_card.html', {'added': False})
 
     # return render(request, 'create_new_card.html', {})
@@ -29,3 +32,6 @@ def export_cards(request):
 # class CardListView(ListView):
 #         model = Card
 #         queryset = Card.objects.all().order_by("box", "-date_created")
+
+# class CardUpdateView(CreateView, UpdateView):
+#     success_url = reverse_lazy("card-list")
