@@ -2,5 +2,49 @@
 
 {% block 'content' %}
   <h1>Welcome to the Language Flashcards app!</h1>
+  <br/>
+  <br/>
+  <br/>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="flashcard">
+            <h5 class='question' style="font-size: 24px;">{{ all_cards.0.question }}</h5>
+            <h5 class='answer' style="font-size: 24px; display: none;">{{ all_cards.0.answer }}</h5>
+          </div>
+          <img src="..." class="card-img-top" alt="..." style="max-height: 150px;">
+        </div>
+      </div>
+    </div>
+  </div>
+  <br/>
+  <br/>
+  <div class="d-flex justify-content-center">
+    <button type="button" class="btn btn-danger mx-1 emoji-btn" style="font-size:60px; width: 300px;">🙁</button>
+    <button type="button" class="btn btn-warning mx-1 emoji-btn" style="font-size: 60px; width: 300px;">😐</button>
+    <button type="button" class="btn btn-success mx-1 emoji-btn" style="font-size: 60px; width: 300px;">🙂</button>
+  </div>
+  <br/>
+  <br/>
+  <br/>
+  <div class="d-flex justify-content-center">
+    <button type="button" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
+  </div>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const flashcard = document.querySelector('.flashcard');
+      const questionElement = flashcard.querySelector('.question');
+      const answerElement = flashcard.querySelector('.answer');
+      const emojis = document.querySelectorAll('.emoji-btn');
+
+      emojis.forEach((emoji) => {
+        emoji.addEventListener('click', () => {
+          questionElement.style.display = 'none';
+          answerElement.style.display = 'block';
+        });
+      });
+    });
+  </script>
 {% endblock %}

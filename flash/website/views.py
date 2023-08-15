@@ -4,7 +4,8 @@ from website.models import Card
 import random
 
 def home(request):
-    return render(request, 'home.html', {})
+    all_cards = Card.objects.all()
+    return render(request, 'home.html', {'all_cards': all_cards})
 
 def all_cards(request):
     all_cards = Card.objects.all()
