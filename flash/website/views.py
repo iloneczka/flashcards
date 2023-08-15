@@ -5,7 +5,8 @@ import random
 
 def home(request):
     all_cards = Card.objects.all()
-    return render(request, 'home.html', {'all_cards': all_cards})
+    random_card = random.choice(all_cards)
+    return render(request, 'home.html', {'card': random_card})
 
 def all_cards(request):
     all_cards = Card.objects.all()

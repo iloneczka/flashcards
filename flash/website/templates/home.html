@@ -10,8 +10,8 @@
       <div class="card text-center">
         <div class="card-body">
           <div class="flashcard">
-            <h5 class='question' style="font-size: 24px;">{{ all_cards.0.question }}</h5>
-            <h5 class='answer' style="font-size: 24px; display: none;">{{ all_cards.0.answer }}</h5>
+            <h5 class='question' style="font-size: 24px;">{{ card.question }}</h5>
+            <h5 class='answer' style="font-size: 24px; display: none;">{{ card.answer }}</h5>
           </div>
           <img src="..." class="card-img-top" alt="..." style="max-height: 150px;">
         </div>
@@ -28,9 +28,12 @@
   <br/>
   <br/>
   <br/>
-  <div class="d-flex justify-content-center">
-    <button type="button" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
-  </div>
+  <form action="{% url 'home' %}" method="POST">
+    {% csrf_token %}
+    <div class="d-flex justify-content-center">
+      <button type="submit" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
+    </div>
+  </form>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -40,7 +43,7 @@
       const emojis = document.querySelectorAll('.emoji-btn');
 
       emojis.forEach((emoji) => {
-        emoji.addEventListener('click', () => {
+        emoji.addEventListener('click', function () {
           questionElement.style.display = 'none';
           answerElement.style.display = 'block';
         });
