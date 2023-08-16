@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## version 0.3 (2023.08.16)
+### Added 
+- Edit export_cards template: added: export to pdf, csv and excel
+- Edit in all_cards: delete and edit buttons
+
+
 ## version 0.2 (2023.08.15)
 
 ### Added 
