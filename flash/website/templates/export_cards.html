@@ -21,10 +21,6 @@
           <tr>
             <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
           </tr>
-          <tr>
-            <th scope="col">Question</th>
-            <th scope="col">Answer</th>
-          </tr>
         </thead>
         <tbody>
           {% for card in all_cards %}
@@ -40,46 +36,144 @@
     {% endfor %}
   </div>
 
-  <!-- Przycisk do drukowania -->
-  <button class="btn btn-primary" id="print-button">Print Table</button>
+  <!-- Przyciski -->
+  <button class="btn btn-primary" id="export-pdf-button">Export to PDF</button>
+  <button class="btn btn-info" id="export-excel-button">Export do Excel</button>
+  <button class="btn btn-primary" id="export-csv-button">Export to CSV</button>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const boxSelect = document.getElementById('box-select');
-      const boxTables = document.querySelectorAll('.box-table');
-      const printButton = document.getElementById('print-button');
+  document.addEventListener('DOMContentLoaded', function () {
+    const boxSelect = document.getElementById('box-select');
+    const boxTables = document.querySelectorAll('.box-table');
+    const exportPdfButton = document.getElementById('export-pdf-button');
+    const exportExcelButton = document.getElementById('export-excel-button'); 
+    const exportCsvButton = document.getElementById('export-csv-button');
 
-      boxSelect.addEventListener('change', () => {
-        const selectedBox = boxSelect.value;
-        boxTables.forEach((table) => {
-          if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-            table.style.display = 'table';
-          } else {
-            table.style.display = 'none';
-          }
-        });
-      });
-
-      printButton.addEventListener('click', () => {
-        const selectedBox = boxSelect.value;
-        boxTables.forEach((table) => {
-          if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-            table.style.display = 'table';
-          } else {
-            table.style.display = 'none';
-          }
-        });
-        document.getElementById('box-select').style.display = 'none'; // Ukryj listę rozwijaną
-        document.querySelector('h1').style.display = 'none'; // Ukryj tytuł
-        window.print();
-
-        // Przywróć widoczność elementów po zakończonym drukowaniu
-        boxTables.forEach((table) => {
+    boxSelect.addEventListener('change', () => {
+      const selectedBox = boxSelect.value;
+      boxTables.forEach((table) => {
+        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
+          table.style.display = 'table';
+        } else {
           table.style.display = 'none';
-        });
-        document.getElementById('box-select').style.display = 'block';
-        document.querySelector('h1').style.display = 'block';
+        }
       });
     });
-  </script>
-{% endblock %}
+
+    exportExcelButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value; // Pobierz wybrany box
+      const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+      const data = {
+        selected_box: selectedBox,
+        csrfmiddlewaretoken: csrfToken,
+      };
+
+      fetch('/export_to_excel/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'cards.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    exportCsvButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value; // Pobierz wybrany box
+      console.log("SPRAWDZAM SELECTED BOX", selectedBox);
+      const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+      const data = {
+        selected_box: selectedBox,
+        csrfmiddlewaretoken: csrfToken,
+      };
+
+      fetch('/export_to_csv/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'cards.csv';
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    exportPdfButton.addEventListener('click', () => {
+        const selectedBox = boxSelect.value; // Pobierz wybrany box
+        const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+        const data = {
+          selected_box: selectedBox,
+          csrfmiddlewaretoken: csrfToken,
+        };
+
+        fetch('/export_to_pdf/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => response.blob())
+        .then(blob => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = 'cards.pdf';
+          a.click();
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+        // printButton.addEventListener('click', () => {
+          // ... (kod do drukowania)
+        // });
+
+
+      // exportCsvButton.addEventListener('click', () => {
+        // Dodaj tutaj logikę eksportu do pliku CSV
+      // });
+
+      // Reszta kodu do drukowania pozostaje niezmieniona
+      // printButton.addEventListener('click', () => {
+      //   const selectedBox = boxSelect.value;
+      //   boxTables.forEach((table) => {
+      //     if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
+      //       table.style.display = 'table';
+      //     } else {
+      //       table.style.display = 'none';
+      //     }
+      //   });
+      //   document.getElementById('box-select').style.display = 'none';
+      //   document.querySelector('h1').style.display = 'none';
+      //   window.print();
+      //   boxTables.forEach((table) => {
+      //     table.style.display = 'none';
+      //   });
+      //   document.getElementById('box-select').style.display = 'block';
+      //   document.querySelector('h1').style.display = 'block';
+      // });
+
+    }); 
+    </script>
+  {% endblock %}

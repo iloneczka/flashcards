@@ -3,11 +3,11 @@
 {% block 'content' %}
     <h1>All Cards</h1>
     <br/>
-    <ul class="list-group">
+    <ul class="list-group", style="">
         {% regroup all_cards by box as box_grouped %}
         {% for box in box_grouped %}
             <li class="list-group-item">
-                <h2>🗃 Box {{ box.grouper }}</h2>
+                <h2>🗃 Box {{ box.grouper }}</h2>  
                 <ul>
                     {% for card in box.list %}
                         <li>
@@ -15,7 +15,6 @@
                             <p>Answer: {{ card.answer }}</p>
                             <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
                             <a type="submit" href="#" class="btn btn-danger delete-card" data-card-id="{{ card.pk }}">Delete</a>
-    
                         </li>
                     {% endfor %}
                 </ul>
@@ -44,17 +43,20 @@
             });
     
             function editCard(cardId) {
-                console.log('Sprawdzam cyz cos sie tu dzieje', cardId);
-                const question = prompt('Enter the new question:');
-                const answer = prompt('Enter the new answer:');
-                const box = prompt('Enter the box (box1, box2, box3):');
+                console.log('Sprawdzam czy coś się tu dzieje', cardId);
+
+                // Wprowadzanie nowych danych
+                const newQuestion = prompt('Enter the new question:');
+                const newAnswer = prompt('Enter the new answer:');
+                const newBox = prompt('Enter the box (box1, box2, box3):');
                 
-                if (question !== null && answer !== null && box !== null) {
+                if (newQuestion !== null && newAnswer !== null && newBox !== null) {
                     const requestData = {
-                        question: question,
-                        answer: answer,
-                        box: box
+                        question: newQuestion,
+                        answer: newAnswer,
+                        box: newBox
                     };
+                    
                     console.log("sprawdzam o to requestData", requestData)
 
                     fetch(`/edit_card/${cardId}/`, {
@@ -78,6 +80,7 @@
                     });
                 }
             }
+
             function deleteCard(cardId) {
                 console.log('Usuwam kartę z ID:', cardId);
                 const confirmDelete = confirm('Are you sure you want to delete this card?');
