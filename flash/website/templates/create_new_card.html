@@ -3,10 +3,13 @@
 {% block 'content' %}
   <h1>Create New Card</h1>
   <br/>
+  <br/>
   {% if added %}
+    <p>Success!</p>
     <p>You added a new card:</p>
     <p>Front Card: {{ question }}</p>
     <p>Back Card: {{ answer }}</p>
+    <br/>
     <br/>
   {% endif %}
   <form action="{% url 'create_new_card' %}" method="POST">

@@ -7,5 +7,7 @@ urlpatterns = [
     # path('' ,views.CardListView.as_view(), name="all_cards"),
     path('create_new_card.html', views.create_new_card, name="create_new_card"),
     # path( "edit/<int:pk>", views.UpdateView.as_view(), name="card-update"),
-    path('export_cards.html', views.export_cards, name="export_cards"),
+    path('export_cards/', views.export_cards, name='export_cards'),
+    path('delete_card/<int:card_id>/', views.delete_card, name="delete_card"),
+    path('edit_card/<int:card_id>/', views.edit_card, name='edit_card')
 ]

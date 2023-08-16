@@ -13,10 +13,91 @@
                         <li>
                             <p>Question: {{ card.question }}</p>
                             <p>Answer: {{ card.answer }}</p>
+                            <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                            <a type="submit" href="#" class="btn btn-danger delete-card" data-card-id="{{ card.pk }}">Delete</a>
+    
                         </li>
                     {% endfor %}
                 </ul>
             </li>
         {% endfor %}
     </ul>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editButtons = document.querySelectorAll('.edit-card');
+            const deleteButtons = document.querySelectorAll('.delete-card');
+        
+            editButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const cardId = button.getAttribute('data-card-id');
+                    editCard(cardId);
+                });
+            });
+    
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const cardId = button.getAttribute('data-card-id');
+                    deleteCard(cardId);
+                });
+            });
+    
+            function editCard(cardId) {
+                console.log('Sprawdzam cyz cos sie tu dzieje', cardId);
+                const question = prompt('Enter the new question:');
+                const answer = prompt('Enter the new answer:');
+                const box = prompt('Enter the box (box1, box2, box3):');
+                
+                if (question !== null && answer !== null && box !== null) {
+                    const requestData = {
+                        question: question,
+                        answer: answer,
+                        box: box
+                    };
+                    console.log("sprawdzam o to requestData", requestData)
+
+                    fetch(`/edit_card/${cardId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(requestData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Zaktualizuj treść na stronie bez konieczności odświeżania
+                            const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+                            const questionElement = cardElement.querySelector('.question');
+                            const answerElement = cardElement.querySelector('.answer');
+                            const boxElement = cardElement.querySelector('.box');
+                            window.location.reload();
+                        }
+                    });
+                }
+            }
+            function deleteCard(cardId) {
+                console.log('Usuwam kartę z ID:', cardId);
+                const confirmDelete = confirm('Are you sure you want to delete this card?');
+    
+                if (confirmDelete) {
+                    fetch(`/delete_card/${cardId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken':  '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload(); // Przeładuj stronę po sukcesie
+                        }
+                    });
+                }
+            }
+        });  // Pamiętaj o zamknięciu nawiasu
+    </script>
 {% endblock %}
