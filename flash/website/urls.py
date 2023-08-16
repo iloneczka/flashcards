@@ -12,6 +12,6 @@ urlpatterns = [
     path('edit_card/<int:card_id>/', views.edit_card, name='edit_card'),
     path('export_to_excel/', views.export_to_excel, name='export_to_excel'),
     path('export_to_csv/', views.export_to_csv, name='export_to_csv'),
-    path('export_to_pdf/', views.export_to_pdf, name='export_to_pdf')
-    # path('print_table/', views.print_table, name='print_table'),
+    path('export_to_pdf/', views.export_to_pdf, name='export_to_pdf'),
+    path('print_table/', views.print_table, name='print_table')
 ]

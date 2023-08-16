@@ -209,7 +209,31 @@ def export_to_pdf(request):
         
         return response
 
+def print_table(request):
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        selected_box = body_data.get('selected_box')
 
+        if selected_box == 'all':
+            all_cards = Card.objects.all()
+        else:
+            all_cards = Card.objects.filter(box=selected_box)
+
+        # Przygotuj dane dla szablonu
+        context = {
+            'all_cards': all_cards,
+        }
+
+        # Wczytaj szablon HTML
+        template = get_template('print_template.html')  # Stworz odpowiedni szablon HTML
+
+        # Renderuj szablon HTML w plik PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
+        html = template.render(context)
+        pisa.CreatePDF(html, dest=response)
+        return response
 
 
        

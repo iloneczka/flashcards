@@ -3,6 +3,22 @@
 {% block 'content' %}
   <h1>Export Cards</h1>
   <br/>
+  <style type="text/css">
+    @media print {
+      /* Ukryj przyciski i inne elementy nieistotne dla drukowania */
+      .btn {
+        display: none;
+      }
+      
+      /* Zmniejsz marginesy i paddingi dla lepszego wykorzystania przestrzeni */
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      
+      /* ... inne dostosowania stylów dla drukowania ... */
+    }
+  </style>
 
   <!-- Lista rozwijana do wyboru boxa -->
   <select class="form-select" id="box-select" aria-label="Select a box">
@@ -37,9 +53,12 @@
   </div>
 
   <!-- Przyciski -->
-  <button class="btn btn-primary" id="export-pdf-button">Export to PDF</button>
-  <button class="btn btn-info" id="export-excel-button">Export do Excel</button>
-  <button class="btn btn-primary" id="export-csv-button">Export to CSV</button>
+  <div class="btn-container">
+    <button class="btn btn-primary" id="export-pdf-button">Export to PDF</button>
+    <button class="btn btn-info" id="export-excel-button">Export to Excel</button>
+    <button class="btn btn-primary" id="export-csv-button">Export to CSV</button>
+    <button class="btn btn-primary" id="print-button">PRINT<button>
+  </div>
 
   <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -48,6 +67,7 @@
     const exportPdfButton = document.getElementById('export-pdf-button');
     const exportExcelButton = document.getElementById('export-excel-button'); 
     const exportCsvButton = document.getElementById('export-csv-button');
+    const printButton = document.getElementById('print-button');
 
     boxSelect.addEventListener('change', () => {
       const selectedBox = boxSelect.value;
@@ -145,35 +165,36 @@
         .catch(error => console.error('Error:', error));
     });
 
-        // printButton.addEventListener('click', () => {
-          // ... (kod do drukowania)
-        // });
+    printButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value;
+      boxTables.forEach((table) => {
+        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
+          table.style.display = 'table';
+        } else {
+          table.style.display = 'none';
+        }
+      });
+      document.getElementById('box-select').style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+      exportPdfButton.style.display = 'none'; // Ukryj przycisk PDF
+      exportExcelButton.style.display = 'none'; // Ukryj przycisk Excel
+      exportCsvButton.style.display = 'none'; // Ukryj przycisk CSV
+      printButton.style.display = 'none'; // Ukryj przycisk Print
 
+      window.print();
+      window.location.reload();
 
-      // exportCsvButton.addEventListener('click', () => {
-        // Dodaj tutaj logikę eksportu do pliku CSV
-      // });
-
-      // Reszta kodu do drukowania pozostaje niezmieniona
-      // printButton.addEventListener('click', () => {
-      //   const selectedBox = boxSelect.value;
-      //   boxTables.forEach((table) => {
-      //     if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-      //       table.style.display = 'table';
-      //     } else {
-      //       table.style.display = 'none';
-      //     }
-      //   });
-      //   document.getElementById('box-select').style.display = 'none';
-      //   document.querySelector('h1').style.display = 'none';
-      //   window.print();
-      //   boxTables.forEach((table) => {
-      //     table.style.display = 'none';
-      //   });
-      //   document.getElementById('box-select').style.display = 'block';
-      //   document.querySelector('h1').style.display = 'block';
-      // });
-
-    }); 
+      // Po zakończeniu drukowania przywróć widoczność przycisków
+      boxTables.forEach((table) => {
+        table.style.display = 'none';
+      });
+      document.getElementById('box-select').style.display = 'block';
+      document.querySelector('h1').style.display = 'block';
+      exportPdfButton.style.display = 'block';
+      exportExcelButton.style.display = 'block';
+      exportCsvButton.style.display = 'block';
+      printButton.style.display = 'block';
+    });
+  });
     </script>
   {% endblock %}
