@@ -8,17 +8,23 @@ from django.http import HttpResponse
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+import json
+
 
 def home(request):
     all_cards = Card.objects.all()
     random_card = random.choice(all_cards)
     return render(request, 'home.html', {'card': random_card})
 
+def flashcard_program(request):
+    all_cards = Card.objects.all()
+    random_card = random.choice(all_cards)
+    return render(request, 'flashcard_program.html', {'card': random_card})
+
 def all_cards(request):
     all_cards = Card.objects.all()
     return render(request, 'all_cards.html', {'all_cards': all_cards})
 
-import json
 
 def edit_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
@@ -235,5 +241,30 @@ def print_table(request):
         pisa.CreatePDF(html, dest=response)
         return response
 
+# def login(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('home')
+#         else:
+#             # Obsługa błędnego logowania
+#             pass
 
-       
+#     return render(request, 'flashcards/login.html')      
+
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             # Automatyczne logowanie użytkownika po rejestracji
+#             login(request, user)
+#             return redirect('home')  # Przekierowanie po zalogowaniu
+#     else:
+#         form = UserCreationForm()
+    
+#     return render(request, 'flashcards/register.html', {'form': form})

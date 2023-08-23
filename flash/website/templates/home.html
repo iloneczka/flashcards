@@ -1,39 +1,22 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block 'content' %}
   <h1>Welcome to the Language Flashcards app!</h1>
   <br/>
   <br/>
   <br/>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card text-center">
-        <div class="card-body">
-          <div class="flashcard">
-            <h5 class='question' style="font-size: 24px;">{{ card.question }}</h5>
-            <h5 class='answer' style="font-size: 24px; display: none;">{{ card.answer }}</h5>
-          </div>
-          <img src="..." class="card-img-top" alt="..." style="max-height: 150px;">
-        </div>
-      </div>
-    </div>
-  </div>
   <br/>
   <br/>
+  <br/>
+
+  <!-- Obrazek "START", który otwiera program fiszek -->
   <div class="d-flex justify-content-center">
-    <button type="button" class="btn btn-danger mx-1 emoji-btn" style="font-size:60px; width: 300px;">🙁</button>
-    <button type="button" class="btn btn-warning mx-1 emoji-btn" style="font-size: 60px; width: 300px;">😐</button>
-    <button type="button" class="btn btn-success mx-1 emoji-btn" style="font-size: 60px; width: 300px;">🙂</button>
+    <a href="{% url 'flashcard_program' %}" role="button">
+      <img src="{% static 'images/start_button.png' %}" alt="Start Button" class="start-img" style="width: 80%; height: auto;">
+    </a>
   </div>
-  <br/>
-  <br/>
-  <br/>
-  <form action="{% url 'home' %}" method="POST">
-    {% csrf_token %}
-    <div class="d-flex justify-content-center">
-      <button type="submit" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
-    </div>
-  </form>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## version 0.4 (2023.08.23)
+### Added 
+- Edit home.html: start_button.png starting the flashcards.program
+- Folder static
+
+
 ## version 0.3 (2023.08.16)
 ### Added 
 - Edit export_cards template: added: export to pdf, csv and excel
