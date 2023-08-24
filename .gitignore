@@ -1,3 +1,4 @@
 /virtual
 **/__pycache__
 /flash/db.sqlite3
+/**/.DS_Store
