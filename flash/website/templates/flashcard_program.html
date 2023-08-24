@@ -13,7 +13,7 @@
             <h5 class='question' style="font-size: 24px;">{{ card.question }}</h5>
             <h5 class='answer' style="font-size: 24px; display: none;">{{ card.answer }}</h5>
           </div>
-          <img src="..." class="card-img-top" alt="..." style="max-height: 150px;">
+          <!-- <img src="..." class="card-img-top" alt="..." style="max-height: 150px;"> -->
         </div>
       </div>
     </div>
@@ -37,7 +37,9 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      console.log("document : " + document)
       const flashcard = document.querySelector('.flashcard');
+      console.log("flashcard wypisuje : " + flashcard)
       const questionElement = flashcard.querySelector('.question');
       const answerElement = flashcard.querySelector('.answer');
       const emojis = document.querySelectorAll('.emoji-btn');

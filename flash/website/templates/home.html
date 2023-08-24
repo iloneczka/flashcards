@@ -3,34 +3,59 @@
 {% load static %}
 
 {% block 'content' %}
-  <h1>Welcome to the Language Flashcards app!</h1>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
+  <style>
+    /* Twoje style CSS */
+  </style>
+
+  <div class="welcome-section">
+    <h1 class="welcome-header">Welcome to the Language Flashcards app!</h1>
+  </div>
   <br/>
   <br/>
 
-  <!-- Obrazek "START", który otwiera program fiszek -->
+  <h2>Press to START</h1>
+    <!-- Twój kod powitalny -->
+  </div>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+ 
+  <br/>
+  <!-- Linki do programu fiszek dla różnych boxów w dwóch liniach -->
   <div class="d-flex justify-content-center">
-    <a href="{% url 'flashcard_program' %}" role="button">
-      <img src="{% static 'images/start_button.png' %}" alt="Start Button" class="start-img" style="width: 80%; height: auto;">
+  <div class="d-flex flex-wrap justify-content-center">
+    <a href="{% url 'flashcard_program_box' box_number=1 %}" %}" data-box="1" role="button" class="m-0.5">
+      <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 80%; height: auto;">
     </a>
+    <a href="{% url 'flashcard_program_box' box_number=2 %}" data-box="2" role="button" class="m-0.5">
+      <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 80%; height: auto;">
+    </a>
+  </div>
+</div>
+
+<div class="my-3"></div> <!-- Pusty element jako odstęp -->
+<br/>
+<br/>
+
+
+<div class="d-flex justify-content-center">
+  <div class="d-flex flex-wrap justify-content-center">
+    <a href="{% url 'flashcard_program_box' box_number=3 %}" data-box="3" role="button" class="m-0.5">
+      <img src="{% static 'images/box_3.png' %}""" alt="Box 3" class="box-img" style="width: 80%; height: auto;">
+    </a>
+    <a href="{% url 'flashcard_program' %}" data-box="all" role="button" class="m-0.5">
+      <img src="{% static 'images/all_cards.png' %}" alt="All Cards" class="box-img" style="width: 80%; height: auto;">
+    </a>
+  </div>
+</div>
+  
+  
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const flashcard = document.querySelector('.flashcard');
-      const questionElement = flashcard.querySelector('.question');
-      const answerElement = flashcard.querySelector('.answer');
-      const emojis = document.querySelectorAll('.emoji-btn');
-
-      emojis.forEach((emoji) => {
-        emoji.addEventListener('click', function () {
-          questionElement.style.display = 'none';
-          answerElement.style.display = 'block';
-        });
-      });
+      /* Twój JavaScript */
     });
   </script>
 {% endblock %}

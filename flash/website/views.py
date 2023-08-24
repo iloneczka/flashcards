@@ -14,16 +14,45 @@ import json
 def home(request):
     all_cards = Card.objects.all()
     random_card = random.choice(all_cards)
-    return render(request, 'home.html', {'card': random_card})
+    unique_boxes = Card.objects.values('box').distinct()
+    return render(request, 'home.html', {'card': random_card, 'unique_boxes': unique_boxes})
 
 def flashcard_program(request):
+    unique_boxes = Card.objects.values('box').distinct()
     all_cards = Card.objects.all()
     random_card = random.choice(all_cards)
-    return render(request, 'flashcard_program.html', {'card': random_card})
+    return render(request, 'flashcard_program.html', {'card': random_card, 'all_cards': all_cards, 'unique_boxes': unique_boxes})
+
+def flashcard_program_box(request, box_number):
+    unique_boxes = Card.objects.values('box').distinct()
+    if request.method == 'POST':
+        box_number = request.POST.get('box_number')
+        cards_in_box = Card.objects.filter(box=box_number)
+        random_card = random.choice(cards_in_box)
+        context = {
+        'cards_in_box': cards_in_box,
+        'random_card': random_card,
+        'unique_boxes': unique_boxes,
+        'box_number': box_number,
+    }
+        return render(request, 'flashcard_program_box.html', context)
+    return render(request, 'flashcard_program_box.html', {'unique_boxes':unique_boxes, 'box_number': box_number})
 
 def all_cards(request):
     all_cards = Card.objects.all()
-    return render(request, 'all_cards.html', {'all_cards': all_cards})
+    unique_boxes = Card.objects.values('box').distinct()
+    return render(request, 'all_cards.html', {'all_cards': all_cards, 'BOXES': BOXES, 'unique_boxes': unique_boxes})
+
+def cards_by_box(request, box_number):
+    cards_in_box = Card.objects.filter(box=box_number)
+    unique_boxes = Card.objects.values('box').distinct()
+    
+    context = {
+        'box_number': box_number,
+        'cards_in_box': cards_in_box,
+        'unique_boxes': unique_boxes,
+    }
+    return render(request, 'cards_by_box.html', context)
 
 
 def edit_card(request, card_id):
@@ -70,10 +99,12 @@ def delete_card(request, card_id):
     return JsonResponse({'status': 'error'}) 
 
 def create_new_card(request):
+    unique_boxes = Card.objects.values('box').distinct()
     if request.method == 'POST':
         question = request.POST.get('question')
         answer = request.POST.get('answer')
         box_value = request.POST.get('box', 'box1') 
+        
 
         # Map box value to box number
         box_mapping = {
@@ -86,9 +117,9 @@ def create_new_card(request):
         if question and answer and box in BOXES:
             card = Card.objects.create(question=question, answer=answer, box=box)
             added = True  # A flag to indicate that a new card was added
-            return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer})
+            return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
 
-    return render(request, 'create_new_card.html')
+    return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
 
 
 def export_to_excel(request):

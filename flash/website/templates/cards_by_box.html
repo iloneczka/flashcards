@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <h1>Box {{ box_number }}</h1>
+    <ul>
+        {% for card in cards_in_box %}
+            <li>{{ card.question }} - {{ card.answer }}</li>
+            <li>
+                <p>Question: {{ card.question }}</p>
+                <p>Answer: {{ card.answer }}</p>
+                <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                <a type="submit" href="#" class="btn btn-danger delete-card" data-card-id="{{ card.pk }}">Delete</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-card');
+        const deleteButtons = document.querySelectorAll('.delete-card');
+        
+        editButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const cardId = button.getAttribute('data-card-id');
+                editCard(cardId);
+            });
+        });
+        
+        deleteButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const cardId = button.getAttribute('data-card-id');
+                deleteCard(cardId);
+            });
+        });
+        
+        function editCard(cardId) {
+            console.log('Sprawdzam czy coś się tu dzieje', cardId);
+        
+            // Wprowadzanie nowych danych
+            const newQuestion = prompt('Enter the new question:');
+            const newAnswer = prompt('Enter the new answer:');
+            const newBox = prompt('Enter the box (box1, box2, box3):');
+            
+            if (newQuestion !== null && newAnswer !== null && newBox !== null) {
+                const requestData = {
+                    question: newQuestion,
+                    answer: newAnswer,
+                    box: newBox
+                };
+                
+                console.log("sprawdzam o to requestData", requestData)
+        
+                fetch(`/edit_card/${cardId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        
+                        const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+                        const questionElement = cardElement.querySelector('.question');
+                        const answerElement = cardElement.querySelector('.answer');
+                        const boxElement = cardElement.querySelector('.box');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+        
+        function deleteCard(cardId) {
+            console.log('Usuwam kartę z ID:', cardId);
+            const confirmDelete = confirm('Are you sure you want to delete this card?');
+        
+            if (confirmDelete) {
+                fetch(`/delete_card/${cardId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken':  '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.reload(); // Przeładowanie strony
+                    }
+                });
+            }
+        }
+        });  
+        </script>
+    {% endblock %}
+            
+

@@ -96,11 +96,11 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            window.location.reload(); // Przeładuj stronę po sukcesie
+                            window.location.reload(); // Przeładowa stronę po sukcesie
                         }
                     });
                 }
             }
-        });  // Pamiętaj o zamknięciu nawiasu
+        });  
     </script>
 {% endblock %}
