@@ -17,26 +17,55 @@ def home(request):
     unique_boxes = Card.objects.values('box').distinct()
     return render(request, 'home.html', {'card': random_card, 'unique_boxes': unique_boxes})
 
-def flashcard_program(request):
-    unique_boxes = Card.objects.values('box').distinct()
-    all_cards = Card.objects.all()
-    random_card = random.choice(all_cards)
-    return render(request, 'flashcard_program.html', {'card': random_card, 'all_cards': all_cards, 'unique_boxes': unique_boxes})
 
-def flashcard_program_box(request, box_number):
+def flashcard_program(request, box_number):
     unique_boxes = Card.objects.values('box').distinct()
+
     if request.method == 'POST':
         box_number = request.POST.get('box_number')
-        cards_in_box = Card.objects.filter(box=box_number)
-        random_card = random.choice(cards_in_box)
-        context = {
-        'cards_in_box': cards_in_box,
-        'random_card': random_card,
-        'unique_boxes': unique_boxes,
+    
+    all_cards = Card.objects.all()
+
+    if box_number == '0':
+        cards = all_cards
+    else:
+        try:
+            box_number = int(box_number)
+            cards = all_cards.filter(box=box_number)
+        except ValueError:
+            cards = Card.objects.none() 
+
+    random_card = cards.order_by('?').first()
+
+    context = {
         'box_number': box_number,
+        'random_card': random_card,
+        'all_cards': all_cards,
+        'unique_boxes': unique_boxes,
+        'all_cards': all_cards
     }
-        return render(request, 'flashcard_program_box.html', context)
-    return render(request, 'flashcard_program_box.html', {'unique_boxes':unique_boxes, 'box_number': box_number})
+
+    if not cards.exists():
+        context['no_cards'] = True
+
+    return render(request, 'flashcard_program.html', context)
+
+
+# def flashcard_program_box(request, box_number):
+#     unique_boxes = Card.objects.values('box').distinct()
+#     if request.method == 'POST':
+#         box_number = request.POST.get('box_number')
+#         cards_in_box = Card.objects.filter(box=box_number)
+#         print(cards_in_box)
+#         random_card = random.choice(cards_in_box)
+#         context = {
+#         'cards_in_box': cards_in_box,
+#         'random_card': random_card,
+#         'unique_boxes': unique_boxes,
+#         'box_number': box_number,
+#     }
+#         return render(request, 'flashcard_program_box.html', context)
+#     return render(request, 'flashcard_program_box.html', {'unique_boxes':unique_boxes, 'box_number': box_number})
 
 def all_cards(request):
     all_cards = Card.objects.all()

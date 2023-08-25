@@ -5,35 +5,42 @@
   <br/>
   <br/>
   <br/>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card text-center">
-        <div class="card-body">
-          <div class="flashcard">
-            <h5 class='question' style="font-size: 24px;">{{ card.question }}</h5>
-            <h5 class='answer' style="font-size: 24px; display: none;">{{ card.answer }}</h5>
+  
+  {% if no_cards %}
+    <h1>No cards available in this box.</h1>
+  {% else %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="flashcard">
+              <h5 class='question' style="font-size: 50px;">{{ random_card.question }}</h5>
+              <h5 class='answer' style="font-size: 50px; display: none;">{{ random_card.answer }}</h5>
+            </div>
+            <!-- <img src="..." class="card-img-top" alt="..." style="max-height: 150px;"> -->
           </div>
-          <!-- <img src="..." class="card-img-top" alt="..." style="max-height: 150px;"> -->
         </div>
       </div>
     </div>
-  </div>
-  <br/>
-  <br/>
-  <div class="d-flex justify-content-center">
-    <button type="button" class="btn btn-danger mx-1 emoji-btn" style="font-size:60px; width: 300px;">🙁</button>
-    <button type="button" class="btn btn-warning mx-1 emoji-btn" style="font-size: 60px; width: 300px;">😐</button>
-    <button type="button" class="btn btn-success mx-1 emoji-btn" style="font-size: 60px; width: 300px;">🙂</button>
-  </div>
-  <br/>
-  <br/>
-  <br/>
-  <form action="{% url 'flashcard_program' %}" method="POST">
-    {% csrf_token %}
+    <br/>
+    <br/>
     <div class="d-flex justify-content-center">
-      <button type="submit" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
+      <button type="button" class="btn btn-danger mx-1 emoji-btn" style="font-size:60px; width: 300px;">🙁</button>
+      <button type="button" class="btn btn-warning mx-1 emoji-btn" style="font-size: 60px; width: 300px;">😐</button>
+      <button type="button" class="btn btn-success mx-1 emoji-btn" style="font-size: 60px; width: 300px;">🙂</button>
     </div>
-  </form>
+    <br/>
+    <br/>
+    <br/>
+    <form action="{% url 'flashcard_program' box_number=box_number %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="box_number" value="{{ box_number }}">
+
+      <div class="d-flex justify-content-center">
+        <button type="submit" style="font-size:30px; width: 300px;" class="btn btn-info">Next Card</button>
+      </div>
+    </form>
+  {% endif %}
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {

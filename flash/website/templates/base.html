@@ -22,9 +22,6 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <li><a class="dropdown-item" href="{% url 'all_cards' %}">All Cards</a></li>
-                  {% for box_number in unique_boxes %}
-                    <li><a class="dropdown-item" href="{% url 'cards_by_box' box_number=box_number.box %}">Box {{ box_number.box }}</a></li>
-                  {% endfor %}
                 </ul>
               </li>
               <li class="nav-item">

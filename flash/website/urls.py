@@ -14,7 +14,7 @@ urlpatterns = [
     path('export_to_csv/', views.export_to_csv, name='export_to_csv'),
     path('export_to_pdf/', views.export_to_pdf, name='export_to_pdf'),
     path('print_table/', views.print_table, name='print_table'),
-    path('flashcard_program/', views.flashcard_program, name='flashcard_program'),
-    path('cards/by_box/<int:box_number>/', views.cards_by_box, name='cards_by_box'),
-    path('flashcard_program_box/<int:box_number>/', views.flashcard_program_box, name='flashcard_program_box')
+    # path('flashcard_program/', views.flashcard_program, name='flashcard_program'),
+    # path('cards/by_box/<int:box_number>/', views.cards_by_box, name='cards_by_box'),
+    path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program')
 ]
