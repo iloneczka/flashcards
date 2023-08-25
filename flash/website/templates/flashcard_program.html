@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block 'content' %}
-  <h1>Welcome to the Language Flashcards app!</h1>
+  <h1>Language Flashcards</h1>
+  {% if box_number != "0" %}
+    <h2>Box {{ box_number }}</h2>
+  {% endif %}
   <br/>
   <br/>
   <br/>

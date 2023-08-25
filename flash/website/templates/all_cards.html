@@ -11,10 +11,10 @@
                 <ul>
                     {% for card in box.list %}
                         <li>
-                            <p>Question: {{ card.question }}</p>
-                            <p>Answer: {{ card.answer }}</p>
+                            <p style="color: black;">Question: {{ card.question }}</p>
+                            <p style="color: black;">Answer: {{ card.answer }}</p>
                             <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
-                            <a type="submit" href="#" class="btn btn-danger delete-card" data-card-id="{{ card.pk }}">Delete</a>
+                            <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
                         </li>
                     {% endfor %}
                 </ul>
