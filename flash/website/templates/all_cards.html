@@ -4,7 +4,7 @@
     <h1>All Cards</h1>
     <br/>
     <ul class="list-group", style="">
-        {% regroup all_cards by box as box_grouped %}
+        {% regroup cards by box as box_grouped %}
         {% for box in box_grouped %}
             <li class="list-group-item">
                 <h2>🗃 Box {{ box.grouper }}</h2>  
