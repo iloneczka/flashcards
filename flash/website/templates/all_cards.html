@@ -3,7 +3,7 @@
 {% block 'content' %}
     <h1>All Cards</h1>
     <br/>
-    <ul class="list-group", style="">
+    <ul class="list-group">
         {% regroup cards by box as box_grouped %}
         {% for box in box_grouped %}
             <li class="list-group-item">
@@ -11,8 +11,8 @@
                 <ul>
                     {% for card in box.list %}
                         <li>
-                            <p style="color: black;">Question: {{ card.question }}</p>
-                            <p style="color: black;">Answer: {{ card.answer }}</p>
+                            <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
+                            <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
                             <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
                             <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
                         </li>
@@ -103,4 +103,17 @@
             }
         });  
     </script>
+<style type="text/css">
+    .card-info {
+        font-size: 25px;
+        color: black;
+    }  
+    /* Powiększenie tekstu w question i answer */
+    .question, .answer {
+        font-size: 25px;
+    }
+    .btn {
+      font-size: 25px;   /* Przyciski*/
+    }
+</style>
 {% endblock %}

@@ -5,28 +5,28 @@
   <br/>
   <br/>
   {% if added %}
-    <p>Success!</p>
-    <p>You added a new card:</p>
-    <p>Front Card: {{ question }}</p>
-    <p>Back Card: {{ answer }}</p>
+    <p class="card-info">Success!</p>
+    <p class="card-info">You added a new card:</p>
+    <p class="card-info">Front Card: <span class="question">{{ question }}</span></p>
+    <p class="card-info">Back Card: <span class="answer">{{ answer }}</span></p>
     <br/>
     <br/>
   {% endif %}
   <form action="{% url 'create_new_card' %}" method="POST">
     {% csrf_token %}
     <div class="form-group">
-      <label for="question" class="form-label">Question:</label>
-      <input type="text" class="form-control" id="question" placeholder="Front Card" name="question">
+      <label for="question" class="form-label card-label">Question:</label>
+      <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question">
     </div>
     <br/>
     <div class="form-group">
-      <label for="answer" class="form-label">Answer:</label>
-      <input type="text" class="form-control" id="answer" placeholder="Back Card" name="answer">
+      <label for="answer" class="form-label card-label">Answer:</label>
+      <input type="text" class="form-control card-input" id="answer" placeholder="Back Card" name="answer">
     </div>
     <br/>
     <div class="form-group">
-      <label for="box" class="form-label">Box:</label>
-      <select id="box" class="form-select" name="box">
+      <label for="box" class="form-label card-label">Box:</label>
+      <select id="box" class="form-select card-input" name="box">
         <option value="box1">Box 1</option>
         <option value="box2">Box 2</option>
         <option value="box3">Box 3</option>
@@ -34,7 +34,20 @@
     </div>
     <br/>
     <div class="d-grid gap-2">
-      <button class="btn btn-success" type="submit">Add</button>
+      <button class="btn btn-success card-button" type="submit">Add</button>
     </div>
   </form>
+  <style type="text/css">
+    .card-info {
+      font-size: 25px;
+      color: black;
+    }  
+    
+    .question, .answer, .card-label, .card-input, .card-button {
+      font-size: 25px;
+    }
+    .btn {
+      font-size: 25px;   /* Przyciski*/
+    }
+  </style>
 {% endblock %}

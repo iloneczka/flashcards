@@ -271,7 +271,6 @@ def print_table(request):
             'all_cards': all_cards,
         }
 
-        # Wczytaj szablon HTML
         template = get_template('print_template.html')  # Stworz odpowiedni szablon HTML
 
         # Renderuj szablon HTML w plik PDF
@@ -280,6 +279,21 @@ def print_table(request):
         html = template.render(context)
         pisa.CreatePDF(html, dest=response)
         return response
+
+
+def update_rating_and_get_new_card(request):
+    if request.method == 'POST' and request.is_ajax():
+        rating = request.POST.get('rating')
+        new_card = user_selected_card.get_random_card_based_on_rating()  
+        response_data = {
+            'question': new_card.question,
+            'answer': new_card.answer,
+        }
+        return JsonResponse(response_data)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 
 # def login(request):
 #     if request.method == 'POST':

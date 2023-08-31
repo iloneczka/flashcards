@@ -14,5 +14,6 @@ urlpatterns = [
     path('print_table/', views.print_table, name='print_table'),
     # path('flashcard_program/', views.flashcard_program, name='flashcard_program'),
     # path('cards/by_box/<int:box_number>/', views.cards_by_box, name='cards_by_box'),
-    path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program')
+    path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program'),
+    path('update_rating_and_get_new_card/', views.update_rating_and_get_new_card, name='update_rating_and_get_new_card'),
 ]

@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 NUM_BOXES = 3
 BOXES = range(1, NUM_BOXES + 1)
@@ -11,17 +12,38 @@ class Card(models.Model):
         default=BOXES[0],
     )
     date_created = models.DateTimeField(auto_now_add=True)
+    
+    RATING_CHOICES = (
+        ('happy', '🙂'),
+        ('neutral', '😐'),
+        ('sad', '🙁'),
+    )
+    user_rating = models.CharField(
+        choices=RATING_CHOICES,
+        default='neutral',
+        max_length=10,
+    )
 
     def __str__(self):
         return self.question
 
-    # def move(self, solved):
-    #     new_box = self.box + 1 if solved else BOXES[0]
+    def update_rating(self, rating):
+        if rating in ['happy', 'neutral', 'sad']:
+            self.user_rating = rating
+            self.save()
 
-    #     if new_box in BOXES:
-    #         self.box = new_box
-    #         self.save()
+    def get_random_card_based_on_rating(self):
+            rating_choices = self.RATING_CHOICES
+            weights = {
+                'happy': 0.1,
+                'neutral': 0.5,
+                'sad': 0.9
+            }
+            cards_to_choose = []
+            for choice, weight in rating_choices:
+                cards_to_choose.extend([choice] * int(weights[choice] * 1000))
+            selected_choice = random.choice(cards_to_choose)
 
-    
+            selected_card = self.objects.filter(user_rating=selected_choice).order_by('?').first()
 
-    return self
+            return selected_card

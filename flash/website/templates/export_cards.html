@@ -4,22 +4,16 @@
   <h1>Export Cards</h1>
   <br/>
   <style type="text/css">
-    @media print {
-      /* Ukryj przyciski i inne elementy nieistotne dla drukowania */
-      .btn {
-        display: none;
-      }
-      
-      /* Zmniejsz marginesy i paddingi dla lepszego wykorzystania przestrzeni */
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      
-      /* ... inne dostosowania stylów dla drukowania ... */
+    .form-select {
+      font-size: 25px; /* Powiększenie czcionki lista */
+    }
+    table {
+      font-size: 25px; /* Czcionka na stronie */
+    }
+    .btn {
+      font-size: 25px;   /* Przyciski*/
     }
   </style>
-
   <!-- Lista rozwijana do wyboru boxa -->
   <select class="form-select" id="box-select" aria-label="Select a box">
     <option selected value="all">All cards</option>
@@ -175,15 +169,14 @@
       });
       document.getElementById('box-select').style.display = 'none';
       document.querySelector('h1').style.display = 'none';
-      exportPdfButton.style.display = 'none'; // Ukryj przycisk PDF
-      exportExcelButton.style.display = 'none'; // Ukryj przycisk Excel
-      exportCsvButton.style.display = 'none'; // Ukryj przycisk CSV
-      printButton.style.display = 'none'; // Ukryj przycisk Print
+      exportPdfButton.style.display = 'none'; // Ukryj przyciski
+      exportExcelButton.style.display = 'none'; 
+      exportCsvButton.style.display = 'none'; 
+      printButton.style.display = 'none'; 
 
       window.print();
       window.location.reload();
 
-      // Po zakończeniu drukowania przywróć widoczność przycisków
       boxTables.forEach((table) => {
         table.style.display = 'none';
       });
@@ -196,4 +189,14 @@
     });
   });
     </script>
+    <style type="text/css">
+    .card-info {
+      font-size: 25px;
+      color: black;
+    }  
+    
+    .question, .answer, .card-label, .card-input, .card-button {
+      font-size: 25px;
+    }
+  </style>
   {% endblock %}

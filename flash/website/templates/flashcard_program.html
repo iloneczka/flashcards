@@ -61,5 +61,38 @@
         });
       });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const emojis = document.querySelectorAll('.emoji-btn');
+
+      emojis.forEach((emoji) => {
+        emoji.addEventListener('click', function () {
+          const selectedRating = emoji.dataset.rating; // Pobieram tutaj ocenę z data-rating
+          sendRatingAndFetchNewCard(selectedRating);
+        });
+      });
+
+      function sendRatingAndFetchNewCard(rating) {
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value; //
+
+        fetch("{% url 'update_rating_and_get_new_card' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({ rating: rating }) 
+        })
+        .then(response => response.json())
+        .then(data => {
+          const flashcard = document.querySelector('.flashcard');
+          const questionElement = flashcard.querySelector('.question');
+          const answerElement = flashcard.querySelector('.answer');
+
+          questionElement.innerText = data.question;
+          answerElement.innerText = data.answer;
+        });
+      }
+    });
   </script>
 {% endblock %}

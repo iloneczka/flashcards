@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## version 0.6 (2023.08.25)
+### Deleted
+- cards_by_box.html 
+- flashcard_program_box.html
+### Added
+- Edit of models.py: update_rating and get_random_card_based_on_rating addes
+- New funcionality added: program display card based on its weight
+
 
 ## version 0.5 (2023.08.24)
 ### Edited
