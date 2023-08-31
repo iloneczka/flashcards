@@ -12,10 +12,10 @@ import json
 
 
 def home(request):
-    all_cards = Card.objects.all()
-    random_card = random.choice(all_cards)
+    # all_cards = Card.objects.all()
+    # random_card = random.choice(all_cards)
     unique_boxes = Card.objects.values('box').distinct()
-    return render(request, 'home.html', {'card': random_card, 'unique_boxes': unique_boxes})
+    return render(request, 'home.html', {'unique_boxes': unique_boxes})
 
 
 def flashcard_program(request, box_number):
