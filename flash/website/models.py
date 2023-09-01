@@ -4,6 +4,7 @@ import random
 NUM_BOXES = 3
 BOXES = range(1, NUM_BOXES + 1)
 
+
 class Card(models.Model):
     question = models.CharField(max_length=100)
     answer = models.CharField(max_length=100)
@@ -12,7 +13,7 @@ class Card(models.Model):
         default=BOXES[0],
     )
     date_created = models.DateTimeField(auto_now_add=True)
-    
+
     RATING_CHOICES = (
         ('happy', '🙂'),
         ('neutral', '😐'),
@@ -33,17 +34,17 @@ class Card(models.Model):
             self.save()
 
     def get_random_card_based_on_rating(self):
-            rating_choices = self.RATING_CHOICES
-            weights = {
-                'happy': 0.1,
-                'neutral': 0.5,
-                'sad': 0.9
-            }
-            cards_to_choose = []
-            for choice, weight in rating_choices:
-                cards_to_choose.extend([choice] * int(weights[choice] * 1000))
-            selected_choice = random.choice(cards_to_choose)
+        rating_choices = self.RATING_CHOICES
+        weights = {
+            'happy': 0.1,
+            'neutral': 0.5,
+            'sad': 0.9
+        }
+        cards_to_choose = []
+        for choice, weight in rating_choices:
+            cards_to_choose.extend([choice] * int(weights[choice] * 1000))
+        selected_choice = random.choice(cards_to_choose)
 
-            selected_card = self.objects.filter(user_rating=selected_choice).order_by('?').first()
+        selected_card = self.objects.filter(user_rating=selected_choice).order_by('?').first()
 
-            return selected_card
+        return selected_card

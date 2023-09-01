@@ -9,6 +9,12 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import json
+import os
+from pathlib import Path
+from django.template.loader import get_template
+from io import BytesIO
+
+# import ho.pisa as pisa
 
 
 def home(request):
@@ -23,7 +29,7 @@ def flashcard_program(request, box_number):
 
     if request.method == 'POST':
         box_number = request.POST.get('box_number')
-    
+
     all_cards = Card.objects.all()
 
     if box_number == '0':
@@ -33,7 +39,7 @@ def flashcard_program(request, box_number):
             box_number = int(box_number)
             cards = all_cards.filter(box=box_number)
         except ValueError:
-            cards = Card.objects.none() 
+            cards = Card.objects.none()
 
     random_card = cards.order_by('?').first()
 
@@ -60,7 +66,7 @@ def all_cards(request, box_number):
         context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
     else:
         context = {'cards': all_cards, 'unique_boxes': unique_boxes}
-    
+
     return render(request, 'all_cards.html', context)
 
 
@@ -77,7 +83,7 @@ def edit_card(request, card_id):
         print('question', question)
         answer = body_data.get('answer')
         print(answer)
-        box_value = body_data.get('box', 'box1') 
+        box_value = body_data.get('box', 'box1')
 
         # Map box value to box number
         box_mapping = {
@@ -85,7 +91,7 @@ def edit_card(request, card_id):
             'box2': 2,
             'box3': 3,
         }
-        box = box_mapping.get(box_value, 1) 
+        box = box_mapping.get(box_value, 1)
 
         if question and answer and box in BOXES:
             card.question = question
@@ -105,15 +111,15 @@ def delete_card(request, card_id):
         card.delete()
         return JsonResponse({'status': 'success'})
 
-    return JsonResponse({'status': 'error'}) 
+    return JsonResponse({'status': 'error'})
+
 
 def create_new_card(request):
     unique_boxes = Card.objects.values('box').distinct()
     if request.method == 'POST':
         question = request.POST.get('question')
         answer = request.POST.get('answer')
-        box_value = request.POST.get('box', 'box1') 
-        
+        box_value = request.POST.get('box', 'box1')
 
         # Map box value to box number
         box_mapping = {
@@ -121,11 +127,11 @@ def create_new_card(request):
             'box2': 2,
             'box3': 3,
         }
-        box = box_mapping.get(box_value, 1) 
+        box = box_mapping.get(box_value, 1)
 
         if question and answer and box in BOXES:
-            card = Card.objects.create(question=question, answer=answer, box=box)
-            added = True  # A flag to indicate that a new card was added
+            # card = Card.objects.create(question=question, answer=answer, box=box)
+            added = True
             return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
@@ -136,7 +142,7 @@ def export_to_excel(request):
         body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
-    
+
         selected_box = body_data.get('selected_box')
         print(request.POST)
         print(selected_box)
@@ -181,12 +187,13 @@ def export_cards(request):
 
     return render(request, 'export_cards.html', context)
 
+
 def export_to_csv(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
-    
+
         selected_box = body_data.get('selected_box')
         print(request.POST)
         print(selected_box)
@@ -207,14 +214,14 @@ def export_to_csv(request):
             writer.writerow([card.question, card.answer])
 
         return response
-    
+
 
 def export_to_pdf(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
-    
+
         selected_box = body_data.get('selected_box')
         print(request.POST)
         print(selected_box)
@@ -224,13 +231,12 @@ def export_to_pdf(request):
         else:
             all_cards = Card.objects.filter(box=selected_box)
 
-         # Create the PDF document
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
 
         doc = SimpleDocTemplate(response, pagesize=landscape(letter))
         data = [[card.question, card.answer] for card in all_cards]
-        
+
         # Create the table
         table = Table(data)
         style = TableStyle([
@@ -245,15 +251,16 @@ def export_to_pdf(request):
             ('RIGHTPADDING', (0, 1), (-1, -1), 10),  # Adjust right padding for data cells
             ('COLWIDTH', (0, 0), (-1, -1), 100),  # Adjust column width for all columns
         ])
-        
+
         table.setStyle(style)
-        
+
         # Build the PDF
         elements = []
         elements.append(table)
         doc.build(elements)
-        
+
         return response
+
 
 def print_table(request):
     if request.method == 'POST':
@@ -266,20 +273,36 @@ def print_table(request):
         else:
             all_cards = Card.objects.filter(box=selected_box)
 
-        # Przygotuj dane dla szablonu
+        # Prepare data for the template
         context = {
             'all_cards': all_cards,
         }
 
-        template = get_template('print_template.html')  # Stworz odpowiedni szablon HTML
+        template = get_template('print_template.html')  # Create the appropriate HTML template
 
-        # Renderuj szablon HTML w plik PDF
+        # Render the HTML template
+        template.render(context)  # Removed the assignment, as it was unused
+
+        # Create an empty buffer to store the PDF file
+        buffer = BytesIO()
+
+        # Create a PDF document using reportlab
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Prepare the PDF content, such as a table, using reportlab
+        elements = []
+        elements.append(Table([['Card', 'Answer']] + [[card.question, card.answer] for card in all_cards]))
+        doc.build(elements)
+
+        # Set HTTP response headers
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
-        html = template.render(context)
-        pisa.CreatePDF(html, dest=response)
-        return response
 
+        # Save the PDF content to the HTTP response
+        buffer.seek(0)
+        response.write(buffer.read())
+
+        return response
 
 def update_rating_and_get_new_card(request):
     if request.method == 'POST' and request.is_ajax():
@@ -307,7 +330,7 @@ def update_rating_and_get_new_card(request):
 #             # Obsługa błędnego logowania
 #             pass
 
-#     return render(request, 'flashcards/login.html')      
+#     return render(request, 'flashcards/login.html')
 
 
 # def register(request):
@@ -320,5 +343,5 @@ def update_rating_and_get_new_card(request):
 #             return redirect('home')  # Przekierowanie po zalogowaniu
 #     else:
 #         form = UserCreationForm()
-    
+
 #     return render(request, 'flashcards/register.html', {'form': form})
