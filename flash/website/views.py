@@ -14,8 +14,6 @@ from pathlib import Path
 from django.template.loader import get_template
 from io import BytesIO
 
-# import ho.pisa as pisa
-
 
 def home(request):
     # all_cards = Card.objects.all()
@@ -304,18 +302,32 @@ def print_table(request):
 
         return response
 
+
 def update_rating_and_get_new_card(request):
     if request.method == 'POST' and request.is_ajax():
-        rating = request.POST.get('rating')
-        new_card = user_selected_card.get_random_card_based_on_rating()  
-        response_data = {
-            'question': new_card.question,
-            'answer': new_card.answer,
-        }
-        return JsonResponse(response_data)
-    else:
-        return JsonResponse({'error': 'Invalid request'}, status=400)
+        try:
+            card_id = request.POST.get('card_id')  # Assuming you pass the card ID in the request data
+            rating = request.POST.get('rating')  # Assuming you pass the rating in the request data
 
+            card = Card.objects.get(id=card_id)
+
+            # Update the card's rating
+            card.update_rating(rating)
+
+            # Get a new card based on the updated rating
+            new_card = card.get_random_card_based_on_rating()
+
+            # Prepare data to send back to the client
+            response_data = {
+                'question': new_card.question,
+                'answer': new_card.answer,
+            }
+
+            return JsonResponse(response_data)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 # def login(request):
