@@ -16,10 +16,6 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
-# run flake8
-COPY . /usr/src/flash/
-RUN flake8 --ignore=E501,F401 /usr/src/flash/
-
 # copy entrypoint.sh
 COPY ./entrypoint.sh .
 RUN sed -i 's/\r$//g' /usr/src/flash/entrypoint.sh
@@ -27,6 +23,9 @@ RUN chmod +x /usr/src/flash/entrypoint.sh
 
 # copy project
 COPY . .
+# run flake8
+RUN python3 manage.py test website
+RUN flake8 --ignore=E501,F401 .
 
 # run entrypoint.sh
 ENTRYPOINT ["/usr/src/flash/entrypoint.sh"]
