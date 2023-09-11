@@ -32,7 +32,6 @@ class CardTests(TestCase):
         self.assertEqual(card.answer, 'New Answer')
         self.assertEqual(card.box, 1)
 
-
     def test_add_new_card_without_front_card(self):
         response = self.client.post(reverse('create_new_card'), {
             'answer': 'Answer',
