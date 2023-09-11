@@ -2,13 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## version 0.8 (2023.09.11)
+### Edited
+- README.md
+### Added
+- initial tests of adding, deleting and changing cards
+
+## version 0.7 (2023.08.31)
+### Added
+- Initial Docker containerization
+- Add file dedicated to production configuration
+
 ## version 0.6 (2023.08.25)
 ### Deleted
 - cards_by_box.html 
 - flashcard_program_box.html
-### Added
+### Edited
 - Edit of models.py: update_rating and get_random_card_based_on_rating addes
-- New funcionality added: program display card based on its weight
+### Added
+- New funcionality: program display card based on its weight
 
 
 ## version 0.5 (2023.08.24)
