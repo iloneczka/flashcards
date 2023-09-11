@@ -160,11 +160,15 @@ I was inspired by my own need to learn Spanish, and flashcards have been a valua
 
 I drew inspiration from the following sources:
 
+- ['Praktyczny Python' training program](https://praktycznypython.pl) My program came to fruition after completing the course. I extend my gratitude to the team for their support and inspiration! 
+
 - [Dockerizing Django with Postgres, Gunicorn, and Nginx](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
 
 - The course "Learn Python Driven Web Development With Django and Python!" on Udemy by [John Elder](https://www.udemy.com/course/build-a-flashcard-website-with-python-and-django/learn/lecture/18296468#overview)
 
 - [Real Python's Django Flashcards App Tutorial](https://realpython.com/django-flashcards-app/#demo-your-django-flashcards-app)
+
+
 
 
 
