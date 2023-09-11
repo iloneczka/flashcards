@@ -16,6 +16,10 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
+# run flake8
+COPY . /usr/src/flash/
+RUN flake8 --ignore=E501,F401 /usr/src/flash/
+
 # copy entrypoint.sh
 COPY ./entrypoint.sh .
 RUN sed -i 's/\r$//g' /usr/src/flash/entrypoint.sh
