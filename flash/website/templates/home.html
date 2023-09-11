@@ -4,12 +4,53 @@
 
 {% block 'content' %}
   <style>
-    /* Twoje style CSS */
+    @media (max-width: 767px) {
+      /* Styl dla małych ekranów (telefony) */
+      .nav-link, .navbar-brand {
+        font-size: 20px;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
+      .nav-link, .navbar-brand {
+        font-size: 25px;
+      }
+
+      .box-img {
+        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
+      }
+    }
   </style>
+
   <br/>
   <div class="welcome-section">
     <h1 class="welcome-header">Welcome to the Language Flashcards app!</h1>
   </div>
+
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <div>
+    <h2>Press Box to START:</h2>
+    <br/>
+    <div class="d-flex flex-wrap justify-content-start">
+      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 50%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 50%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 50%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 50%; height: auto;">
+      </a>
+  </div>
+  
   <br/>
   <br/>
   <br/>
@@ -18,33 +59,6 @@
   <br/>
   <br/>
 
-  <h2>Press Box to START:</h1>
-    <!-- Twój kod powitalny -->
-  </div>
-  <br/>
-  <br/>
-  <!-- Linki do programu fiszek dla różnych boxów w dwóch liniach -->
-  <div class="d-flex flex-wrap justify-content-center">
-    <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
-      <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 80%; height: auto;">
-    </a>
-    <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
-      <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 80%; height: auto;">
-    </a>
-  </div>
-  <div class="my-3"></div> <!-- Pusty element jako odstęp -->
-  <br/>
-  <br/>
-  <div class="d-flex flex-wrap justify-content-center">
-    <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
-      <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 80%; height: auto;">
-    </a>
-    <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
-      <img src="{% static 'images/box_0.png' %}" alt="Box 0" class="box-img" style="width: 80%; height: auto;">
-    </a>
-  </div>
-  </div>
-  </div>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       /* Twój JavaScript */
