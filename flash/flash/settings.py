@@ -28,7 +28,11 @@ DEBUG = bool(os.environ.get("DEBUG", default=0))
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:1337',
+    'http://192.168.1.99:1337',
+    'http://isladeazafatas.synology.me:51337',
+]
 
 # Application definition
 
