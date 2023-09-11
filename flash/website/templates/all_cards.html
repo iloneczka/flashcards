@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block 'content' %}
-    <h1>All Cards</h1>
+    <h1 style="font-size: 25px;">All Cards</h1>
     <br/>
     <ul class="list-group">
         {% regroup cards by box as box_grouped %}
         {% for box in box_grouped %}
             <li class="list-group-item">
-                <h2>🗃 Box {{ box.grouper }}</h2>  
+                <h2style="font-size: 24px;">🗃 Box {{ box.grouper }}</h2>  
                 <ul>
                     {% for card in box.list %}
                         <li>
@@ -105,15 +105,15 @@
     </script>
 <style type="text/css">
     .card-info {
-        font-size: 25px;
+        font-size: 15px;
         color: black;
     }  
     /* Powiększenie tekstu w question i answer */
     .question, .answer {
-        font-size: 25px;
+        font-size: 15px;
     }
     .btn {
-      font-size: 25px;   /* Przyciski*/
+      font-size: 15px;   /* Przyciski*/
     }
 </style>
 {% endblock %}
