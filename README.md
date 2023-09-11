@@ -6,8 +6,8 @@
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Running With Docker](#running-with-docker)
-   - [Production](#production)
    - [Development](#development)
+   - [Production](#production)
 - [Running without Docker](#running-without-docker)
 - [Testing](#testing)
 - [Mechanism](#mechanism)
@@ -42,8 +42,32 @@ The Flashcard Language Learning App is a web application designed to help users 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)  ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)  ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
 
 
-
 ## Running With Docker 
+
+### __DEVELOPEMENT__
+
+#### Prerequisites
+
+Before running the app with Docker for developement, make sure you have Docker and Docker Compose installed on your system.
+
+#### Usage
+
+1. Build and start the Docker containers:
+
+```
+docker-compose -f docker-compose.dev.yml up -d --build
+```
+2. Apply migrations:
+
+```
+docker-compose -f docker-compose.dev.yml exec web python manage.py migrate --noinput
+```
+
+3. Open your web browser and go to:
+
+```
+http://localhost:8000
+```
 
 ### __PRODUCTION__
 
@@ -67,31 +91,7 @@ docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --no
 3. Open your web browser and go to:
 
 ```
-http://192.168.1.99:1337
-```
-### __DEVELOPEMENT__
-
-#### Prerequisites
-
-Before running the app with Docker in production, make sure you have Docker and Docker Compose installed on your system.
-
-#### Usage
-
-1. Build and start the Docker containers:
-
-```
-docker-compose -f docker-compose.dev.yml up -d --build
-```
-2. Apply migrations:
-
-```
-docker-compose -f docker-compose.dev.yml exec web python manage.py migrate --noinput
-```
-
-3. Open your web browser and go to:
-
-```
-http://localhost:8000
+http://localhost:1337
 ```
 
 ## Running without Docker
@@ -116,7 +116,7 @@ flake8==6.0.0
 1. Activate your virtual environment:
 
 ```
-source flash/bin/activate
+source virtual/bin/activate
 ```
 
 2. Start the Django development server:
