@@ -119,7 +119,6 @@ def create_new_card(request):
         answer = request.POST.get('answer')
         box_value = request.POST.get('box', 'box1')
 
-        # Map box value to box number
         box_mapping = {
             'box1': 1,
             'box2': 2,
@@ -128,7 +127,7 @@ def create_new_card(request):
         box = box_mapping.get(box_value, 1)
 
         if question and answer and box in BOXES:
-            # card = Card.objects.create(question=question, answer=answer, box=box)
+            card = Card.objects.create(question=question, answer=answer, box=box)
             added = True
             return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
 
