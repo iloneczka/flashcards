@@ -5,8 +5,10 @@
 - [General Info](#general-info)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
+- [Running With Docker](#running-with-docker)
+   - [Production](#production)
+   - [Development](#development)
+- [Running without Docker](#running-without-docker)
 - [Testing](#testing)
 - [Mechanism](#mechanism)
 - [Future Plans](#future-plans)
@@ -41,14 +43,91 @@ The Flashcard Language Learning App is a web application designed to help users 
 
 
 
+## Running With Docker 
 
-## Prerequisites
+### __PRODUCTION__
 
-TODO
+#### Prerequisites
 
-## Setup
+Before running the app with Docker in production, make sure you have Docker and Docker Compose installed on your system.
 
-TODO
+#### Usage
+
+1. Build and start the Docker containers:
+
+```
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+2. Apply migrations:
+
+```
+docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+```
+
+3. Open your web browser and go to:
+
+```
+http://192.168.1.99:1337
+```
+### __DEVELOPEMENT__
+
+#### Prerequisites
+
+Before running the app with Docker in production, make sure you have Docker and Docker Compose installed on your system.
+
+#### Usage
+
+1. Build and start the Docker containers:
+
+```
+docker-compose -f docker-compose.dev.yml up -d --build
+```
+2. Apply migrations:
+
+```
+docker-compose -f docker-compose.dev.yml exec web python manage.py migrate --noinput
+```
+
+3. Open your web browser and go to:
+
+```
+http://localhost:8000
+```
+
+## Running without Docker
+
+### Prerequisites
+
+Before running the app without Docker, make sure you have the following packages installed in your virtual environment:
+
+```bash
+asgiref==3.7.2
+Django==4.2.4
+Pillow==10.0.0
+reportlab==4.0.4
+sqlparse==0.4.4
+XlsxWriter==3.1.2
+psycopg2-binary==2.9.6
+gunicorn==21.2.0
+flake8==6.0.0
+```
+## Usage
+
+1. Activate your virtual environment:
+
+```
+source flash/bin/activate
+```
+
+2. Start the Django development server:
+
+```
+python manage.py runserver
+```
+3. Open your web browser and go to:
+```
+http://localhost:8000
+```
 
 ## Testing
 
@@ -69,10 +148,24 @@ The app employs a weighted randomization technique that adjusts the frequency of
 
 ## Future Plans
 
-TOTO
+- Implement user authentication at the beginning of the page (username and password) so that each user can have their own set of flashcards.
+- Change the current boxes to be dynamic, allowing users to add and customize their names.
+- Add the ability to import from CSV and Excel files, in addition to the existing export options.
+- Make design enhancements, including the addition of graphics, and ensure the layout is responsive for both computers and mobile devices.
+
+
 ## Inspirations and Acknowledgments
 
-TODO
+I was inspired by my own need to learn Spanish, and flashcards have been a valuable tool for me in this process. That's why I decided to create my own program.
+
+I drew inspiration from the following sources:
+
+- [Dockerizing Django with Postgres, Gunicorn, and Nginx](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/)
+
+- The course "Learn Python Driven Web Development With Django and Python!" on Udemy by [John Elder](https://www.udemy.com/course/build-a-flashcard-website-with-python-and-django/learn/lecture/18296468#overview)
+
+- [Real Python's Django Flashcards App Tutorial](https://realpython.com/django-flashcards-app/#demo-your-django-flashcards-app)
+
 
 
 
