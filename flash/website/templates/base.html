@@ -10,6 +10,18 @@
         .nav-link, .navbar-brand {
             font-size: 30px; /* Rozmiar czcionki navbaru */
         }
+        @media (max-width: 767px) {
+            /* Styl dla małych ekranów (telefony) */
+            .nav-link, .navbar-brand {
+                font-size: 20px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
+            .nav-link, .navbar-brand {
+                font-size: 25px;
+            }
     </style>
   </head>
   <body>
