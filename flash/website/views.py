@@ -1,19 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.template.loader import get_template
 from website.models import Card, BOXES
 import random
 import csv
 import xlsxwriter
-from django.http import HttpResponse
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import json
 import os
 from pathlib import Path
-from django.template.loader import get_template
 from io import BytesIO
-
 
 def home(request):
     # all_cards = Card.objects.all()
@@ -83,7 +81,6 @@ def edit_card(request, card_id):
         print(answer)
         box_value = body_data.get('box', 'box1')
 
-        # Map box value to box number
         box_mapping = {
             'box1': 1,
             'box2': 2,
@@ -187,7 +184,7 @@ def export_cards(request):
 
 def export_to_csv(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
+        body_unicode = request.body.decode('utf-8') 
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -215,7 +212,7 @@ def export_to_csv(request):
 
 def export_to_pdf(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
+        body_unicode = request.body.decode('utf-8') 
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -244,15 +241,14 @@ def export_to_pdf(request):
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust left padding for data cells
-            ('RIGHTPADDING', (0, 1), (-1, -1), 10),  # Adjust right padding for data cells
-            ('COLWIDTH', (0, 0), (-1, -1), 100),  # Adjust column width for all columns
+            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust
+            ('RIGHTPADDING', (0, 1), (-1, -1), 10),
+            ('COLWIDTH', (0, 0), (-1, -1), 100),
         ])
 
         table.setStyle(style)
 
-        # Build the PDF
-        elements = []
+        elements = [] # Stwórz PDF
         elements.append(table)
         doc.build(elements)
 
@@ -270,20 +266,15 @@ def print_table(request):
         else:
             all_cards = Card.objects.filter(box=selected_box)
 
-        # Prepare data for the template
         context = {
             'all_cards': all_cards,
         }
 
-        template = get_template('print_template.html')  # Create the appropriate HTML template
+        template = get_template('print_template.html')
+        template.render(context)  
 
-        # Render the HTML template
-        template.render(context)  # Removed the assignment, as it was unused
-
-        # Create an empty buffer to store the PDF file
         buffer = BytesIO()
 
-        # Create a PDF document using reportlab
         doc = SimpleDocTemplate(buffer, pagesize=letter)
 
         # Prepare the PDF content, such as a table, using reportlab
