@@ -3,29 +3,41 @@
 {% block 'content' %}
     <h1 style="font-size: 25px;">All Cards</h1>
     <br/>
-    <ul class="list-group">
-        {% regroup cards by box as box_grouped %}
-        {% for box in box_grouped %}
-            <li class="list-group-item">
-                <h2style="font-size: 24px;">🗃 Box {{ box.grouper }}</h2>  
-                <ul>
-                    {% for card in box.list %}
-                        <li>
-                            <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
-                            <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
-                            <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
-                            <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="container text-center">
+        <div class="row">
+            {% for box in unique_boxes reversed %}
+                <div class="col">
+                    <table class="table box-table" data-box="{{ box.box }}">
+                        <thead>
+                            <tr> 
+                                <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for card in cards %}
+                                {% if box.box == 'all' or card.box == box.box %}
+                                    <tr>
+                                        <td>
+                                            <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
+                                            <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
+                                            <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                                            <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const editButtons = document.querySelectorAll('.edit-card');
             const deleteButtons = document.querySelectorAll('.delete-card');
-        
+
             editButtons.forEach((button) => {
                 button.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -33,7 +45,7 @@
                     editCard(cardId);
                 });
             });
-    
+
             deleteButtons.forEach((button) => {
                 button.addEventListener('click', (event) => {
                     event.preventDefault();
