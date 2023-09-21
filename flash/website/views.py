@@ -12,12 +12,19 @@ import json
 import os
 from pathlib import Path
 from io import BytesIO
+from django.contrib.auth import authenticate, login, logout
+from .forms import UserCreationForm, LoginForm
+
 
 def home(request):
+    return render(request, 'home.html')
+
+
+def boxes(request):
     # all_cards = Card.objects.all()
     # random_card = random.choice(all_cards)
     unique_boxes = Card.objects.values('box').distinct()
-    return render(request, 'home.html', {'unique_boxes': unique_boxes})
+    return render(request, 'boxes.html', {'unique_boxes': unique_boxes})
 
 
 def flashcard_program(request, box_number):
@@ -71,7 +78,7 @@ def edit_card(request, card_id):
 
     if request.method == 'POST':
         print("Sprawdzam request", request.body)
-        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
+        body_unicode = request.body.decode('utf-8')  # Zdekoduj ten string, bez tego nie działało
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -133,7 +140,7 @@ def create_new_card(request):
 
 def export_to_excel(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
+        body_unicode = request.body.decode('utf-8')  # Zdekoduj
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -184,7 +191,7 @@ def export_cards(request):
 
 def export_to_csv(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8') 
+        body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -212,7 +219,7 @@ def export_to_csv(request):
 
 def export_to_pdf(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8') 
+        body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -248,7 +255,7 @@ def export_to_pdf(request):
 
         table.setStyle(style)
 
-        elements = [] # Stwórz PDF
+        elements = []
         elements.append(table)
         doc.build(elements)
 
@@ -271,7 +278,7 @@ def print_table(request):
         }
 
         template = get_template('print_template.html')
-        template.render(context)  
+        template.render(context)
 
         buffer = BytesIO()
 
@@ -318,6 +325,40 @@ def update_rating_and_get_new_card(request):
             return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# signup page
+def user_signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+# login page
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                return redirect('home')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+
+# logout page
+def user_logout(request):
+    logout(request)
+    return redirect('login')
 
 
 # def login(request):

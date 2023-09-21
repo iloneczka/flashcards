@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## version 0.9 (2023.09.21)
+### Added
+- Register, Login and Logout options
+- Log Out button in main navbar
+### Edited
+- home.html - Login overview
+
 ## version 0.8 (2023.09.11)
 ### Edited
 - README.md

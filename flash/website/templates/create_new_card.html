@@ -14,6 +14,9 @@
   {% endif %}
   <form action="{% url 'create_new_card' %}" method="POST">
     {% csrf_token %}
+    {% if user.is_authenticated %}
+      <input type="hidden" name="user" value="{{ user.id }}">
+    {% endif %}
     <div class="form-group">
       <label for="question" class="form-label card-label">Question:</label>
       <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question">

@@ -1,64 +1,63 @@
-{% extends 'base.html' %}
-
-{% load static %}
-
 {% block 'content' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Language Flashcards</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <style>
-    @media (max-width: 767px) {
-      /* Styl dla małych ekranów (telefony) */
       .nav-link, .navbar-brand {
-        font-size: 15px;
+          font-size: 15px; /* Rozmiar czcionki navbaru */
       }
-    }
-
-    @media (min-width: 768px) and (max-width: 991px) {
-      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
-      .nav-link, .navbar-brand {
-        font-size: 15px;
+      @media (max-width: 768px) {
+          /* Styl dla małych ekranów (telefony) */
+          .nav-link, .navbar-brand {
+              font-size: 15px;
+          }
       }
 
-      .box-img {
-        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
+      @media (min-width: 768px) and (max-width: 991px) {
+          /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
+          .nav-link, .navbar-brand {
+              font-size: 15px;
+          }
       }
-    }
   </style>
+</head>
 
-  <br/>
-  <div class="welcome-section">
-      <h1 class="welcome-header" style="font-size: 25px;">Welcome to the Language Flashcards app!</h1
-  </div>
-  <br/>
-  <br/>
-  <br/>
-  <div>
-    <h2 style="font-size: 20px;">Press Box to START:</h2>
-    <br/>
-    <div class="d-flex flex-wrap justify-content-start">
-      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 20%; height: auto;">
-      </a>
-  </div>
-  
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
+<nav class="navbar navbar-expand-lg bg-body-tertiary py-2" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Language Flashcards</a>
+    </div>
+</nav>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      /* Twój JavaScript */
-    });
-  </script>
+{% if request.user.is_authenticated %}
+  <div class="alert alert-success" role="alert">
+    You are logged in!
+  </div>
+  <p>Welcome, {{ request.user.username }}</p>
+  <a href="{% url 'logout' %}" class="btn btn-danger">Log out</a>
+  <a href="{% url 'boxes' %}" class="btn btn-primary">START THE FLASHCARDS APP</a>
+{% else %}
+  <br/>
+  <form action="{% url 'boxes' %}" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label">Username</label>
+      <input type="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+      <div id="emailHelp" class="form-text">Write your login here.</div>
+    </div>
+    <div class="mb-3">
+      <label for="exampleInputPassword1" class="form-label">Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword1">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <br/>
+  <p>If you don't have an account, please register:</p>
+  <a href="{% url 'signup' %}" class="btn btn-success">Sign Up</a>
+{% endif %}
+</html>
 {% endblock %}

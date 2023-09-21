@@ -18,5 +18,9 @@ urlpatterns = [
     # path('flashcard_program/', views.flashcard_program, name='flashcard_program'),
     # path('cards/by_box/<int:box_number>/', views.cards_by_box, name='cards_by_box'),
     path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program'),
-    path('update_rating_and_get_new_card/', views.update_rating_and_get_new_card, name='update_rating_and_get_new_card')
+    path('update_rating_and_get_new_card/', views.update_rating_and_get_new_card, name='update_rating_and_get_new_card'),
+    path('login/', views.user_login, name='login'),
+    path('signup/', views.user_signup, name='signup'),
+    path('logout/', views.user_logout, name='logout'),
+    path('boxes', views.boxes, name='boxes')
 ]

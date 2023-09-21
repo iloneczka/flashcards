@@ -4,33 +4,37 @@
     <h1 style="font-size: 25px;">All Cards</h1>
     <br/>
     <div class="container text-center">
-        <div class="row">
-            {% for box in unique_boxes reversed %}
-                <div class="col">
-                    <table class="table box-table" data-box="{{ box.box }}">
-                        <thead>
-                            <tr> 
-                                <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for card in cards %}
-                                {% if box.box == 'all' or card.box == box.box %}
-                                    <tr>
-                                        <td>
-                                            <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
-                                            <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
-                                            <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
-                                            <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% endfor %}
-        </div>
+        {% if cards %}
+            <div class="row">
+                {% for box in unique_boxes reversed %}
+                    <div class="col">
+                        <table class="table box-table" data-box="{{ box.box }}">
+                            <thead>
+                                <tr> 
+                                    <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for card in cards %}
+                                    {% if box.box == 'all' or card.box == box.box %}
+                                        <tr>
+                                            <td>
+                                                <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
+                                                <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
+                                                <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                                                <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No cards available. Go to <a href="{% url 'create_new_card' %}">Create New Card</a>.</p>
+        {% endif %}
     </div>
 
     <script>
