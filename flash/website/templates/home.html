@@ -1,37 +1,6 @@
+{% extends 'base.html' %}
+
 {% block 'content' %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Language Flashcards</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <style>
-      .nav-link, .navbar-brand {
-          font-size: 15px; /* Rozmiar czcionki navbaru */
-      }
-      @media (max-width: 768px) {
-          /* Styl dla małych ekranów (telefony) */
-          .nav-link, .navbar-brand {
-              font-size: 15px;
-          }
-      }
-
-      @media (min-width: 768px) and (max-width: 991px) {
-          /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
-          .nav-link, .navbar-brand {
-              font-size: 15px;
-          }
-      }
-  </style>
-</head>
-
-<nav class="navbar navbar-expand-lg bg-body-tertiary py-2" data-bs-theme="dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Language Flashcards</a>
-    </div>
-</nav>
 
 {% if request.user.is_authenticated %}
   <div class="alert alert-success" role="alert">
@@ -42,19 +11,25 @@
   <a href="{% url 'boxes' %}" class="btn btn-primary">START THE FLASHCARDS APP</a>
 {% else %}
   <br/>
-  <form action="{% url 'boxes' %}" method="post">
+  <form method="POST" action="{% url 'boxes' %}">
     {% csrf_token %}
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Username</label>
-      <input type="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+      <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
       <div id="emailHelp" class="form-text">Write your login here.</div>
     </div>
     <div class="mb-3">
       <label for="exampleInputPassword1" class="form-label">Password</label>
-      <input type="password" class="form-control" id="exampleInputPassword1">
+      <input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+
+  {% if request.method == 'POST' and not form.is_valid %}
+    <div class="alert alert-danger mt-3">
+      Both fields are required.
+    </div>
+  {% endif %}
   <br/>
   <p>If you don't have an account, please register:</p>
   <a href="{% url 'signup' %}" class="btn btn-success">Sign Up</a>

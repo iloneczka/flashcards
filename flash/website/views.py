@@ -329,18 +329,22 @@ def update_rating_and_get_new_card(request):
 
 # signup page
 def user_signup(request):
+    print("drukuje")
     if request.method == 'POST':
+        print('request:', request)
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('login')
     else:
         form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+        print("Wszedlem tu else")
+    return render(request, 'registration/signup.html', {'form': form})
 
 
 # login page
 def user_login(request):
+    print('login druuuk')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -350,15 +354,17 @@ def user_login(request):
             if user:
                 login(request, user)
                 return redirect('home')
+        else:
+            form.add_error(None, "Both fields are required.")  # Dodajemy ogólny błąd do formularza
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'registration/login.html', {'form': form})
 
 
 # logout page
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return redirect('registration/login.html')
 
 
 # def login(request):

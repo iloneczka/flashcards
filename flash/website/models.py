@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import random
 
 NUM_BOXES = 3
@@ -6,6 +7,7 @@ BOXES = range(1, NUM_BOXES + 1)
 
 
 class Card(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Nowe pole odnoszące się do użytkownika
     question = models.CharField(max_length=100)
     answer = models.CharField(max_length=100)
     box = models.IntegerField(
@@ -45,6 +47,6 @@ class Card(models.Model):
             cards_to_choose.extend([choice] * int(weights[choice] * 1000))
         selected_choice = random.choice(cards_to_choose)
 
-        selected_card = self.objects.filter(user_rating=selected_choice).order_by('?').first()
+        selected_card = Card.objects.filter(user_rating=selected_choice, user=self.user).order_by('?').first()
 
         return selected_card
