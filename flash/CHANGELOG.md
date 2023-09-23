@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Version 0.10 (2023.09.23)
+### Added
+- Added notifications for incorrect login and password attempts.
+### Edited
+- Updated `home.html`, the main template for selecting boxes.
+
 ## version 0.9 (2023.09.21)
 ### Added
 - Register, Login and Logout options

@@ -14,17 +14,15 @@ from pathlib import Path
 from io import BytesIO
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserCreationForm, LoginForm
+from django.contrib import messages
 
 
 def home(request):
-    return render(request, 'home.html')
+    if not request.user.is_authenticated:
+        return redirect('login')  # Przekieruj użytkownika na stronę logowania
 
-
-def boxes(request):
-    # all_cards = Card.objects.all()
-    # random_card = random.choice(all_cards)
     unique_boxes = Card.objects.values('box').distinct()
-    return render(request, 'boxes.html', {'unique_boxes': unique_boxes})
+    return render(request, 'home.html', {'unique_boxes': unique_boxes})
 
 
 def flashcard_program(request, box_number):
@@ -342,9 +340,7 @@ def user_signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-# login page
 def user_login(request):
-    print('login druuuk')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -353,9 +349,11 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
+                messages.success(request, f'Welcome, {username}!')
+                print('zalogowałem:', user)
                 return redirect('home')
-        else:
-            form.add_error(None, "Both fields are required.")  # Dodajemy ogólny błąd do formularza
+            else:
+                messages.error(request, 'Invalid username or password.')
     else:
         form = LoginForm()
     return render(request, 'registration/login.html', {'form': form})

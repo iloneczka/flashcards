@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
@@ -17,13 +16,10 @@ urlpatterns = [
     path('export_to_csv/', views.export_to_csv, name='export_to_csv'),
     path('export_to_pdf/', views.export_to_pdf, name='export_to_pdf'),
     path('print_table/', views.print_table, name='print_table'),
-    # path('flashcard_program/', views.flashcard_program, name='flashcard_program'),
-    # path('cards/by_box/<int:box_number>/', views.cards_by_box, name='cards_by_box'),
     path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program'),
     path('update_rating_and_get_new_card/', views.update_rating_and_get_new_card, name='update_rating_and_get_new_card'),
     path('registration/login/', views.user_login, name='login'),
     path('registration/signup/', views.user_signup, name='signup'),
     path('logout/', views.user_logout, name='logout'),
-    path('boxes', views.boxes, name='boxes'),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

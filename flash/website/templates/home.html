@@ -1,38 +1,65 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block 'content' %}
+  <style>
+    @media (max-width: 767px) {
+      /* Styl dla małych ekranów (telefony) */
+      .nav-link, .navbar-brand {
+        font-size: 15px;
+      }
+    }
 
-{% if request.user.is_authenticated %}
-  <div class="alert alert-success" role="alert">
-    You are logged in!
+    @media (min-width: 768px) and (max-width: 991px) {
+      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
+      .nav-link, .navbar-brand {
+        font-size: 15px;
+      }
+
+      .box-img {
+        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
+      }
+    }
+  </style>
+
+  <br/>
+  <div class="welcome-section">
+      <h1 class="welcome-header" style="font-size: 25px;">Welcome to the Language Flashcards app!</h1
+        <h2>Hello, {{ request.user.username }}!</h2>
   </div>
-  <p>Welcome, {{ request.user.username }}</p>
-  <a href="{% url 'logout' %}" class="btn btn-danger">Log out</a>
-  <a href="{% url 'boxes' %}" class="btn btn-primary">START THE FLASHCARDS APP</a>
-{% else %}
   <br/>
-  <form method="POST" action="{% url 'boxes' %}">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="exampleInputEmail1" class="form-label">Username</label>
-      <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
-      <div id="emailHelp" class="form-text">Write your login here.</div>
-    </div>
-    <div class="mb-3">
-      <label for="exampleInputPassword1" class="form-label">Password</label>
-      <input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+  <br/>
+  <br/>
+  <div>
+    <h2 style="font-size: 20px;">Press Box to START:</h2>
+    <br/>
+    <div class="d-flex flex-wrap justify-content-start">
+      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 20%; height: auto;">
+      </a>
+  </div>
+  
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
 
-  {% if request.method == 'POST' and not form.is_valid %}
-    <div class="alert alert-danger mt-3">
-      Both fields are required.
-    </div>
-  {% endif %}
-  <br/>
-  <p>If you don't have an account, please register:</p>
-  <a href="{% url 'signup' %}" class="btn btn-success">Sign Up</a>
-{% endif %}
-</html>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      /* Twój JavaScript */
+    });
+  </script>
 {% endblock %}
