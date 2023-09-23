@@ -359,36 +359,6 @@ def user_login(request):
     return render(request, 'registration/login.html', {'form': form})
 
 
-# logout page
 def user_logout(request):
     logout(request)
-    return redirect('registration/login.html')
-
-
-# def login(request):
-#     if request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('home')
-#         else:
-#             # Obsługa błędnego logowania
-#             pass
-
-#     return render(request, 'flashcards/login.html')
-
-
-# def register(request):
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             # Automatyczne logowanie użytkownika po rejestracji
-#             login(request, user)
-#             return redirect('home')  # Przekierowanie po zalogowaniu
-#     else:
-#         form = UserCreationForm()
-
-#     return render(request, 'flashcards/register.html', {'form': form})
+    return redirect('login')

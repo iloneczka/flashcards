@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added notifications for incorrect login and password attempts.
 ### Edited
 - Updated `home.html`, the main template for selecting boxes.
+- Configured login and logout redirections
 
 ## version 0.9 (2023.09.21)
 ### Added
