@@ -58,7 +58,6 @@ def flashcard_program(request, box_number):
     return render(request, 'flashcard_program.html', context)
 
 
-
 @login_required
 def all_cards(request, box_number):
     unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
@@ -186,7 +185,6 @@ def export_to_excel(request):
         return response
 
 
-
 def export_cards(request):
     unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
     all_cards = Card.objects.filter(user=request.user)
@@ -224,7 +222,6 @@ def export_to_csv(request):
             writer.writerow([card.question, card.answer])
 
         return response
-
 
 
 def export_to_pdf(request):
@@ -268,7 +265,6 @@ def export_to_pdf(request):
         doc.build(elements)
 
         return response
-
 
 
 def print_table(request):
