@@ -155,13 +155,12 @@ def export_to_excel(request):
         print('body_data', body_data)
 
         selected_box = body_data.get('selected_box')
-        print(request.POST)
-        print(selected_box)
+
         # Pobierz dane kart z wybranego boxa lub wszystkie karty
         if selected_box == 'all':
-            all_cards = Card.objects.all()
+            all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box)
+            all_cards = Card.objects.filter(box=selected_box, user=request.user)
 
         # Tworzenie pliku Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -187,9 +186,10 @@ def export_to_excel(request):
         return response
 
 
+
 def export_cards(request):
-    unique_boxes = Card.objects.values('box').distinct()
-    all_cards = Card.objects.all()
+    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
+    all_cards = Card.objects.filter(user=request.user)
 
     context = {
         'unique_boxes': unique_boxes,
@@ -206,13 +206,12 @@ def export_to_csv(request):
         print('body_data', body_data)
 
         selected_box = body_data.get('selected_box')
-        print(request.POST)
-        print(selected_box)
+
         # Pobierz dane kart z wybranego boxa lub wszystkie karty
         if selected_box == 'all':
-            all_cards = Card.objects.all()
+            all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box)
+            all_cards = Card.objects.filter(box=selected_box, user=request.user)
 
         # Tworzenie pliku CSV
         response = HttpResponse(content_type='text/csv')
@@ -227,6 +226,7 @@ def export_to_csv(request):
         return response
 
 
+
 def export_to_pdf(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -234,13 +234,11 @@ def export_to_pdf(request):
         print('body_data', body_data)
 
         selected_box = body_data.get('selected_box')
-        print(request.POST)
-        print(selected_box)
-        # Pobierz dane kart z wybranego boxa lub wszystkie karty
+
         if selected_box == 'all':
-            all_cards = Card.objects.all()
+            all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box)
+            all_cards = Card.objects.filter(box=selected_box, user=request.user)
 
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
@@ -272,11 +270,14 @@ def export_to_pdf(request):
         return response
 
 
+
 def print_table(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         selected_box = body_data.get('selected_box')
+
+        all_cards = Card.objects.filter(user=request.user)
 
         if selected_box == 'all':
             all_cards = Card.objects.all()
