@@ -26,13 +26,14 @@ def home(request):
     return render(request, 'home.html', {'unique_boxes': unique_boxes})
 
 
+@login_required
 def flashcard_program(request, box_number):
-    unique_boxes = Card.objects.values('box').distinct()
+    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
 
     if request.method == 'POST':
         box_number = request.POST.get('box_number')
 
-    all_cards = Card.objects.all()
+    all_cards = Card.objects.filter(user=request.user)
 
     if box_number == '0':
         cards = all_cards
@@ -48,15 +49,14 @@ def flashcard_program(request, box_number):
     context = {
         'box_number': box_number,
         'random_card': random_card,
-        'all_cards': all_cards,
         'unique_boxes': unique_boxes,
-        'all_cards': all_cards
     }
 
     if not cards.exists():
         context['no_cards'] = True
 
     return render(request, 'flashcard_program.html', context)
+
 
 
 @login_required
