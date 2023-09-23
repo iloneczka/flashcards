@@ -15,6 +15,7 @@ from io import BytesIO
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserCreationForm, LoginForm
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
@@ -58,15 +59,16 @@ def flashcard_program(request, box_number):
     return render(request, 'flashcard_program.html', context)
 
 
+@login_required
 def all_cards(request, box_number):
-    all_cards = Card.objects.all()
-    unique_boxes = Card.objects.values('box').distinct()
+    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
 
     if box_number != 0:
-        cards = all_cards.filter(box=box_number)
+        cards = Card.objects.filter(user=request.user, box=box_number)
         context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
     else:
-        context = {'cards': all_cards, 'unique_boxes': unique_boxes}
+        cards = Card.objects.filter(user=request.user)
+        context = {'cards': cards, 'unique_boxes': unique_boxes}
 
     return render(request, 'all_cards.html', context)
 
@@ -114,12 +116,17 @@ def delete_card(request, card_id):
     return JsonResponse({'status': 'error'})
 
 
+@login_required
 def create_new_card(request):
+    print("request", request)
     unique_boxes = Card.objects.values('box').distinct()
+    print("unique bxes drukuje", unique_boxes)
     if request.method == 'POST':
+        print("request", request)
         question = request.POST.get('question')
         answer = request.POST.get('answer')
         box_value = request.POST.get('box', 'box1')
+        print("printuje: ", question, answer, box_value)
 
         box_mapping = {
             'box1': 1,
@@ -128,10 +135,15 @@ def create_new_card(request):
         }
         box = box_mapping.get(box_value, 1)
 
-        if question and answer and box in BOXES:
-            Card.objects.create(question=question, answer=answer, box=box)
+        if request.user.is_authenticated:
+            user = request.user
+            print('DRUKUJE user:', user)
+            print("USER ID:", user.id)
+            Card.objects.create(user=user, question=question, answer=answer, box=box)
             added = True
             return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
+        else:
+            pass
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
 

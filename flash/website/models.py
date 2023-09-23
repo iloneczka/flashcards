@@ -7,7 +7,7 @@ BOXES = range(1, NUM_BOXES + 1)
 
 
 class Card(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Nowe pole odnoszące się do użytkownika
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.CharField(max_length=100)
     answer = models.CharField(max_length=100)
     box = models.IntegerField(

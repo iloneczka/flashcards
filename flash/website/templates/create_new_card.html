@@ -12,9 +12,12 @@
     <br/>
     <br/>
   {% endif %}
+  {% if user.is_authenticated %}
   <form action="{% url 'create_new_card' %}" method="POST">
     {% csrf_token %}
-    {% if user.is_authenticated %}
+    <script>
+      console.log("DRUKUJEIdentyfikator użytkownika: {{ user.id }}");
+    </script>
       <input type="hidden" name="user" value="{{ user.id }}">
     {% endif %}
     <div class="form-group">
