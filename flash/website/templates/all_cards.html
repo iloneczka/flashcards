@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <h1 style="font-size: 25px;">All Cards</h1>
+    <br/>
+    <div class="container text-center">
+        {% if cards %}
+            <div class="row">
+                {% for box in unique_boxes reversed %}
+                    <div class="col">
+                        <table class="table box-table" data-box="{{ box.box }}">
+                            <thead>
+                                <tr> 
+                                    <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for card in cards %}
+                                    {% if box.box == 'all' or card.box == box.box %}
+                                        <tr>
+                                            <td>
+                                                <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
+                                                <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
+                                                <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                                                <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No cards available. Go to <a href="{% url 'create_new_card' %}">Create New Card</a>.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editButtons = document.querySelectorAll('.edit-card');
+            const deleteButtons = document.querySelectorAll('.delete-card');
+
+            editButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const cardId = button.getAttribute('data-card-id');
+                    editCard(cardId);
+                });
+            });
+
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const cardId = button.getAttribute('data-card-id');
+                    deleteCard(cardId);
+                });
+            });
+    
+            function editCard(cardId) {
+                console.log('Sprawdzam czy coś się tu dzieje', cardId);
+
+                // Wprowadzanie nowych danych
+                const newQuestion = prompt('Enter the new question:');
+                const newAnswer = prompt('Enter the new answer:');
+                const newBox = prompt('Enter the box (box1, box2, box3):');
+                
+                if (newQuestion !== null && newAnswer !== null && newBox !== null) {
+                    const requestData = {
+                        question: newQuestion,
+                        answer: newAnswer,
+                        box: newBox
+                    };
+                    
+                    console.log("sprawdzam o to requestData", requestData)
+
+                    fetch(`/edit_card/${cardId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(requestData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Zaktualizuj treść na stronie bez konieczności odświeżania
+                            const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+                            const questionElement = cardElement.querySelector('.question');
+                            const answerElement = cardElement.querySelector('.answer');
+                            const boxElement = cardElement.querySelector('.box');
+                            window.location.reload();
+                        }
+                    });
+                }
+            }
+
+            function deleteCard(cardId) {
+                console.log('Usuwam kartę z ID:', cardId);
+                const confirmDelete = confirm('Are you sure you want to delete this card?');
+    
+                if (confirmDelete) {
+                    fetch(`/delete_card/${cardId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken':  '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload(); // Przeładowa stronę po sukcesie
+                        }
+                    });
+                }
+            }
+        });  
+    </script>
+<style type="text/css">
+    .card-info {
+        font-size: 15px;
+        color: black;
+    }  
+    /* Powiększenie tekstu w question i answer */
+    .question, .answer {
+        font-size: 15px;
+    }
+    .btn {
+      font-size: 15px;   /* Przyciski*/
+    }
+</style>
+{% endblock %}

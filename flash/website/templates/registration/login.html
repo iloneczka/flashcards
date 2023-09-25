@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+
+{% if request.user.is_authenticated %}
+  <p>{{ request.user.username }}</p>
+  <a href="{% url 'logout' %}">Logout</a>
+{% else %}
+  <br/>
+  <h1>Login</h1>
+
+  <form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.username.label_tag }} {{ form.username }}<br>
+    {{ form.password.label_tag }} {{ form.password }}<br>
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+
+  {% if form.errors %}
+    <div class="alert alert-danger mt-3">
+      {{ form.non_field_errors.as_text }}
+    </div>
+  {% endif %}
+
+  <br>
+  <a href="{% url 'signup' %}" class="btn btn-success">Don't have an Account? Create</a>
+{% endif %}
+{% endblock %}

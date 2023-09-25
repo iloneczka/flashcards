@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+  <h1 style="font-size: 25px;">Export Cards</h1>
+  <br/>
+  <style type="text/css">
+    .form-select {
+      font-size: 15px; /* Powiększenie czcionki lista */
+    }
+    table {
+      font-size: 15px; /* Czcionka na stronie */
+    }
+    .btn {
+      font-size: 15px;   /* Przyciski*/
+    }
+  </style>
+  <!-- Lista rozwijana do wyboru boxa -->
+  <select class="form-select" id="box-select" aria-label="Select a box">
+    <option selected value="all">All cards</option>
+    <option disabled>──────────</option>
+    {% for box in unique_boxes %}
+      <option value="{{ box.box }}">Box {{ box.box }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Tabela z kartami -->
+  <div class="card-tables">
+    {% for box in unique_boxes %}
+      <table class="table box-table" data-box="{{ box.box }}">
+        <thead>
+          <tr>
+            <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for card in all_cards %}
+            {% if box.box == 'all' or card.box == box.box %}
+              <tr>
+                <td>{{ card.question }}</td>
+                <td>{{ card.answer }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+
+  <div class="btn-success-container">
+    <button class="btn btn-success" id="export-pdf-button">Export to PDF</button>
+    <button class="btn btn-secondary" id="export-excel-button">Export to Excel</button>
+    <button class="btn btn-success" id="export-csv-button">Export to CSV</button>
+    <button class="btn btn-secondary" id="print-button">PRINT<button>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const boxSelect = document.getElementById('box-select');
+    const boxTables = document.querySelectorAll('.box-table');
+    const exportPdfButton = document.getElementById('export-pdf-button');
+    const exportExcelButton = document.getElementById('export-excel-button'); 
+    const exportCsvButton = document.getElementById('export-csv-button');
+    const printButton = document.getElementById('print-button');
+
+    boxSelect.addEventListener('change', () => {
+      const selectedBox = boxSelect.value;
+      boxTables.forEach((table) => {
+        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
+          table.style.display = 'table';
+        } else {
+          table.style.display = 'none';
+        }
+      });
+    });
+
+    exportExcelButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value; // Pobierz wybrany box
+      const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+      const data = {
+        selected_box: selectedBox,
+        csrfmiddlewaretoken: csrfToken,
+      };
+
+      fetch('/export_to_excel/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'cards.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    exportCsvButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value; // Pobierz wybrany box
+      console.log("SPRAWDZAM SELECTED BOX", selectedBox);
+      const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+      const data = {
+        selected_box: selectedBox,
+        csrfmiddlewaretoken: csrfToken,
+      };
+
+      fetch('/export_to_csv/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'cards.csv';
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    exportPdfButton.addEventListener('click', () => {
+        const selectedBox = boxSelect.value; // Pobierz wybrany box
+        const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
+        const data = {
+          selected_box: selectedBox,
+          csrfmiddlewaretoken: csrfToken,
+        };
+
+        fetch('/export_to_pdf/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => response.blob())
+        .then(blob => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = 'cards.pdf';
+          a.click();
+          window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    printButton.addEventListener('click', () => {
+      const selectedBox = boxSelect.value;
+      boxTables.forEach((table) => {
+        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
+          table.style.display = 'table';
+        } else {
+          table.style.display = 'none';
+        }
+      });
+      document.getElementById('box-select').style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+      exportPdfButton.style.display = 'none'; // Ukryj przyciski
+      exportExcelButton.style.display = 'none'; 
+      exportCsvButton.style.display = 'none'; 
+      printButton.style.display = 'none'; 
+
+      window.print();
+      window.location.reload();
+
+      boxTables.forEach((table) => {
+        table.style.display = 'none';
+      });
+      document.getElementById('box-select').style.display = 'block';
+      document.querySelector('h1').style.display = 'block';
+      exportPdfButton.style.display = 'block';
+      exportExcelButton.style.display = 'block';
+      exportCsvButton.style.display = 'block';
+      printButton.style.display = 'block';
+    });
+  });
+    </script>
+    <style type="text/css">
+    .card-info {
+      font-size: 25px;
+      color: black;
+    }  
+    
+    .question, .answer, .card-label, .card-input, .card-button {
+      font-size: 25px;
+    }
+  </style>
+  {% endblock %}

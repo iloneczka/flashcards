@@ -1,0 +1,9 @@
+asgiref==3.7.2
+Django==4.2.4
+Pillow==10.0.0
+reportlab==4.0.4
+sqlparse==0.4.4
+XlsxWriter==3.1.2
+psycopg2-binary==2.9.6
+gunicorn==21.2.0
+flake8==6.0.0

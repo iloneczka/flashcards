@@ -1,1 +1,65 @@
-<h1>Hello World! Ilo</h1>
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'content' %}
+  <style>
+    @media (max-width: 767px) {
+      /* Styl dla małych ekranów (telefony) */
+      .nav-link, .navbar-brand {
+        font-size: 15px;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
+      .nav-link, .navbar-brand {
+        font-size: 15px;
+      }
+
+      .box-img {
+        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
+      }
+    }
+  </style>
+
+  <br/>
+  <div class="welcome-section">
+      <h1 class="welcome-header" style="font-size: 25px;">Hello, {{ request.user.username }}!</h1
+        <h2>Welcome to the Flashcard Language Learning App!</h2>
+  </div>
+  <br/>
+  <br/>
+  <br/>
+  <div>
+    <h2 style="font-size: 20px;">Press Box to START:</h2>
+    <br/>
+    <div class="d-flex flex-wrap justify-content-start">
+      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 20%; height: auto;">
+      </a>
+      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
+          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 20%; height: auto;">
+      </a>
+  </div>
+  
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      /* Twój JavaScript */
+    });
+  </script>
+{% endblock %}

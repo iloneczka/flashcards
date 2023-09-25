@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+  <h1 style="font-size: 25px;">Language Flashcards</h1>
+  {% if box_number != "0" %}
+    <h2 style="font-size: 20px;">Box {{ box_number }}</h2>
+  {% endif %}
+  <br/>
+  <br/>
+  <br/>
+  
+  {% if no_cards %}
+    <h1 style="font-size: 20px;"></h1>No cards available in this box.</h1>
+  {% else %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="flashcard">
+              <h5 class='question' style="font-size: 24px;">{{ random_card.question }}</h5>
+              <h5 class='answer' style="font-size: 24px; display: none;">{{ random_card.answer }}</h5>
+            </div>
+            <!-- <img src="..." class="card-img-top" alt="..." style="max-height: 150px;"> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="d-flex justify-content-center">
+      <button type="button" class="btn btn-danger mx-1 emoji-btn" style="font-size:30px; width: 100px;">🙁</button>
+      <button type="button" class="btn btn-warning mx-1 emoji-btn" style="font-size:30px; width: 100px;">😐</button>
+      <button type="button" class="btn btn-success mx-1 emoji-btn" style="font-size:30px; width: 100px;">🙂</button>
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <form action="{% url 'flashcard_program' box_number=box_number %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="box_number" value="{{ box_number }}">
+
+      <div class="d-flex justify-content-center">
+        <button type="submit" style="font-size: 15px; width: 100px;" class="btn btn-info">Next Card</button>
+      </div>
+    </form>
+  {% endif %}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log("document : " + document)
+      const flashcard = document.querySelector('.flashcard');
+      console.log("flashcard wypisuje : " + flashcard)
+      const questionElement = flashcard.querySelector('.question');
+      const answerElement = flashcard.querySelector('.answer');
+      const emojis = document.querySelectorAll('.emoji-btn');
+
+      emojis.forEach((emoji) => {
+        emoji.addEventListener('click', function () {
+          questionElement.style.display = 'none';
+          answerElement.style.display = 'block';
+        });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const emojis = document.querySelectorAll('.emoji-btn');
+
+      emojis.forEach((emoji) => {
+        emoji.addEventListener('click', function () {
+          const selectedRating = emoji.dataset.rating; // Pobieram tutaj ocenę z data-rating
+          sendRatingAndFetchNewCard(selectedRating);
+        });
+      });
+
+      function sendRatingAndFetchNewCard(rating) {
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value; //
+
+        fetch("{% url 'update_rating_and_get_new_card' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({ rating: rating }) 
+        })
+        .then(response => response.json())
+        .then(data => {
+          const flashcard = document.querySelector('.flashcard');
+          const questionElement = flashcard.querySelector('.question');
+          const answerElement = flashcard.querySelector('.answer');
+
+          questionElement.innerText = data.question;
+          answerElement.innerText = data.answer;
+        });
+      }
+    });
+  </script>
+{% endblock %}
