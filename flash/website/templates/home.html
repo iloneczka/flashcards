@@ -3,63 +3,114 @@
 {% load static %}
 
 {% block 'content' %}
-  <style>
-    @media (max-width: 767px) {
-      /* Styl dla małych ekranów (telefony) */
-      .nav-link, .navbar-brand {
-        font-size: 15px;
-      }
+<style>
+  @media (max-width: 767px) {
+    .nav-link, .navbar-brand {
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    .nav-link, .navbar-brand {
+      font-size: 15px;
     }
 
-    @media (min-width: 768px) and (max-width: 991px) {
-      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
-      .nav-link, .navbar-brand {
-        font-size: 15px;
-      }
-
-      .box-img {
-        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
-      }
+    .box-img {
+      margin: 0 5px;
     }
-  </style>
+  }
 
-  <br/>
-  <div class="welcome-section">
-      <h1 class="welcome-header" style="font-size: 25px;">Hello, {{ request.user.username }}!</h1
-        <h2>Welcome to the Flashcard Language Learning App!</h2>
-  </div>
-  <br/>
-  <br/>
-  <br/>
-  <div>
-    <h2 style="font-size: 20px;">Press Box to START:</h2>
-    <br/>
-    <div class="d-flex flex-wrap justify-content-start">
-      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 20%; height: auto;">
-      </a>
-  </div>
-  
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
+  .thumbnail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      /* Twój JavaScript */
+  .thumbnail img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+
+<br/>
+<div class="welcome-section">
+  <h1 class="welcome-header" style="font-size: 25px;">Hello, {{ request.user.username }}!</h1>
+  <h2>Welcome to the Flashcard Language Learning App!</h2>
+</div>
+<br/>
+<br/>
+<br/>
+<div class="carousel slide" id="myCarousel">
+  <div class="carousel-inner">
+    <div class="item active">
+      <div class="row">
+        <div class="col-md-3" style="position: relative;">
+          <div class="thumbnail">
+            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 1"></a>
+            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+              <h4 style="margin: 0;">Box 1</h4>
+            </div>
+          </div>
+          <div class="caption text-center">
+            <p>Przykładowy tekst</p>
+            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=1 %}">» START</a>
+          </div>
+        </div>
+        <div class="col-md-3" style="position: relative;">
+          <div class="thumbnail">
+            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 2"></a>
+            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+              <h4 style="margin: 0;">Box 2</h4>
+            </div>
+          </div>
+          <div class="caption text-center">
+            <p>Przykładowy tekst</p>
+            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=2 %}">» START</a>
+          </div>
+        </div>
+        <div class="col-md-3" style="position: relative;">
+          <div class="thumbnail">
+            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 3"></a>
+            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+              <h4 style="margin: 0;">Box 3</h4>
+            </div>
+          </div>
+          <div class="caption text-center">
+            <p>Przykładowy tekst</p>
+            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=3 %}">» START</a>
+          </div>
+        </div>
+        <div class="col-md-3" style="position: relative;">
+          <div class="thumbnail">
+            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="All cards"></a>
+            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+              <h4 style="margin: 0;">All cards</h4>
+            </div>
+          </div>
+          <div class="caption text-center">
+            <p>Przykładowy tekst</p>
+            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=0 %}">» START</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-box">
+    <a data-slide="prev" href="#myCarousel" class="carousel-control left">‹</a>
+    <a data-slide="next" href="#myCarousel" class="carousel-control right">›</a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.carousel').carousel({
+      interval: 5000 // Pięć sekund
     });
-  </script>
+  });
+</script>
+
 {% endblock %}
