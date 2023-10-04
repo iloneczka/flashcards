@@ -24,15 +24,15 @@ def home(request):
         return redirect('login')
 
     if request.method == 'POST' and 'create_box' in request.POST:
-        Box.create_new_box(request.user)
-        return redirect('home')
+        new_box = Box.create_new_box(request.user)
+        return JsonResponse({'status': 'success', 'new_box_number': new_box.box_number})
 
     if request.method == 'POST' and 'delete_box' in request.POST:
         box_id = request.POST.get('box_id')
         box = get_object_or_404(Box, pk=box_id, user=request.user)
         box.delete()
+        return JsonResponse({'status': 'success'})
 
-    # Fetch unique boxes for the logged-in user
     unique_boxes = Box.get_unique_boxes(request.user)
 
     return render(request, 'home.html', {'unique_boxes': unique_boxes})
@@ -74,7 +74,7 @@ def create_new_box(request):
     print("PRINTUJE 1 request:", request)
     if request.method == 'POST':
         print("PRINTUJE 2 request.method:", request.method)
-        user = request.user  # Poprawione: dodane przypisanie `user`
+        user = request.user
         
         max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
         
