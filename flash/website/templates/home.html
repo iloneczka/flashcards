@@ -35,7 +35,7 @@
 
   .thumbnail .delete-button {
     position: absolute;
-    bottom: -100px;
+    bottom: -87px;
     right: 60px;
     transform: scale(0.50);
   }
@@ -57,7 +57,7 @@
                 <div class="col-md-3" style="position: relative;">
                     <div class="thumbnail">
                         <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}"></a>
-                        <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
                             <h4 style="margin: 0;">Box {{ box.box_number }}</h4>
                             {% if forloop.last %}
                                 <form method="post" action="{% url 'delete_box' box.box_number %}" style="display: inline;">
@@ -68,7 +68,6 @@
                         </div>
                     </div>
                     <div class="caption text-center">
-                        <p>Przykładowy tekst</p>
                         <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=box.box_number %}">» START</a>
                     </div>
                 </div>
@@ -76,7 +75,7 @@
             <div class="col-md-3" style="position: relative;">
                 <div class="thumbnail">
                     <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Create New Box"></a>
-                    <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                    <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
                         <h4 style="margin: 0;">Create New Box</h4>
                     </div>
                 </div>
@@ -90,12 +89,11 @@
             <div class="col-md-3" style="position: relative;">
                 <div class="thumbnail">
                     <a href="#"><img src="{% static 'images/szablon.png' %}" alt="All cards"></a>
-                    <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                    <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
                         <h4 style="margin: 0;">All cards</h4>
                     </div>
                 </div>
                 <div class="caption text-center">
-                    <p>Przykładowy tekst</p>
                     <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=0 %}">» START</a>
                 </div>
             </div>
