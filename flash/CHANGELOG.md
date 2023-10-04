@@ -2,12 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Version 0.10 (2023.09.23)
+## Version 0.11 (2023.10.04)
 ### Added
-- Added notifications for incorrect login and password attempts.
+- class Box in models
 ### Edited
-- Updated `home.html`, the main template for selecting boxes.
-- Configured login and logout redirections
+- Updated `home.html` based on new models.py
 
 ## version 0.9 (2023.09.21)
 ### Added

@@ -12,37 +12,35 @@
     <br/>
     <br/>
   {% endif %}
+
   {% if user.is_authenticated %}
-  <form action="{% url 'create_new_card' %}" method="POST">
-    {% csrf_token %}
-    <script>
-      console.log("DRUKUJEIdentyfikator użytkownika: {{ user.id }}");
-    </script>
-      <input type="hidden" name="user" value="{{ user.id }}">
-    {% endif %}
-    <div class="form-group">
-      <label for="question" class="form-label card-label">Question:</label>
-      <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question">
-    </div>
-    <br/>
-    <div class="form-group">
-      <label for="answer" class="form-label card-label">Answer:</label>
-      <input type="text" class="form-control card-input" id="answer" placeholder="Back Card" name="answer">
-    </div>
-    <br/>
-    <div class="form-group">
-      <label for="box" class="form-label card-label">Box:</label>
-      <select id="box" class="form-select card-input" name="box">
-        <option value="box1">Box 1</option>
-        <option value="box2">Box 2</option>
-        <option value="box3">Box 3</option>
-      </select>
-    </div>
-    <br/>
-    <div class="d-grid gap-2">
-      <button class="btn btn-success card-button" type="submit">Add</button>
-    </div>
-  </form>
+    <form action="{% url 'create_new_card' %}" method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="question" class="form-label card-label">Question:</label>
+        <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question">
+      </div>
+      <br/>
+      <div class="form-group">
+        <label for="answer" class="form-label card-label">Answer:</label>
+        <input type="text" class="form-control card-input" id="answer" placeholder="Back Card" name="answer">
+      </div>
+      <br/>
+      <div class="form-group">
+        <label for="box" class="form-label card-label">Box:</label>
+        <select id="box" class="form-select card-input" name="box">
+          {% for box in boxes %}
+            <option value="{{ box.box_number }}">Box {{ box.box_number }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <br/>
+      <div class="d-grid gap-2">
+        <button class="btn btn-success card-button" type="submit">Add</button>
+      </div>
+    </form>
+  {% endif %}
+  
   <style type="text/css">
     .card-info {
       font-size: 15px;

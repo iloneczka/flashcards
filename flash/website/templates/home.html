@@ -46,40 +46,34 @@
   <div class="carousel-inner">
     <div class="item active">
       <div class="row">
+        {% for box in unique_boxes %}
+          <div class="col-md-3" style="position: relative;">
+            {% if box.box %}
+              <div class="thumbnail">
+                <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box }}"></a>
+                <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                  <h4 style="margin: 0;">Box {{ box.box.box_number }}</h4>
+                </div>
+              </div>
+              <div class="caption text-center">
+                <p>Przykładowy tekst</p>
+                <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=box.box.box.number %}">» START</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
         <div class="col-md-3" style="position: relative;">
           <div class="thumbnail">
-            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 1"></a>
+            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Create New Box"></a>
             <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
-              <h4 style="margin: 0;">Box 1</h4>
+              <h4 style="margin: 0;">Create New Box</h4>
             </div>
           </div>
           <div class="caption text-center">
-            <p>Przykładowy tekst</p>
-            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=1 %}">» START</a>
-          </div>
-        </div>
-        <div class="col-md-3" style="position: relative;">
-          <div class="thumbnail">
-            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 2"></a>
-            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
-              <h4 style="margin: 0;">Box 2</h4>
-            </div>
-          </div>
-          <div class="caption text-center">
-            <p>Przykładowy tekst</p>
-            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=2 %}">» START</a>
-          </div>
-        </div>
-        <div class="col-md-3" style="position: relative;">
-          <div class="thumbnail">
-            <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box 3"></a>
-            <div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
-              <h4 style="margin: 0;">Box 3</h4>
-            </div>
-          </div>
-          <div class="caption text-center">
-            <p>Przykładowy tekst</p>
-            <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=3 %}">» START</a>
+            <form method="post" action="{% url 'create_new_box' %}">
+              {% csrf_token %}
+              <button type="submit" name="create_box" class="btn btn-mini btn-primary">CREATE NEW BOX</button>
+            </form>
           </div>
         </div>
         <div class="col-md-3" style="position: relative;">
@@ -108,7 +102,31 @@
 <script>
   $(document).ready(function() {
     $('.carousel').carousel({
-      interval: 5000 // Pięć sekund
+      interval: 5000
+    });
+
+    $('form').submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        url: $(this).attr('action'),
+        method: 'POST',
+        data: $(this).serialize(),
+        success: function(data) {
+          if (data.status === 'success') {
+            var newBoxNumber = data.new_box_number;
+            var newBoxHtml = '<div class="item"><div class="row"><div class="col-md-3" style="position: relative;">'+
+              '<div class="thumbnail"><a href="#"><img src="{% static "images/szablon.png" %}" alt="Box ' + newBoxNumber + '"></a>'+
+              '<div style="position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">'+
+              '<h4 style="margin: 0;">Box ' + newBoxNumber + '</h4></div></div><div class="caption text-center">'+
+              '<p>Przykładowy tekst</p><a class="btn btn-mini btn-primary" href="{% url "flashcard_program" box_number=' + newBoxNumber + ' %}">» START</a>'+
+              '</div></div></div></div>';
+
+            $('#myCarousel .carousel-inner').append(newBoxHtml);
+            $('#myCarousel .item').removeClass('active');
+            $('#myCarousel .item:last-child').addClass('active');
+          }
+        }
+      });
     });
   });
 </script>

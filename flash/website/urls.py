@@ -22,4 +22,6 @@ urlpatterns = [
     path('registration/signup/', views.user_signup, name='signup'),
     path('logout/', views.user_logout, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('create_new_box/', views.create_new_box, name='create_new_box'),
+    path('delete_box/<int:box_id>/', views.delete_box, name='delete_box'),
 ]

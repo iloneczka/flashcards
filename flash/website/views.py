@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
-from website.models import Card, BOXES
+from website.models import Card, Box
 import random
 import csv
 import xlsxwriter
@@ -16,13 +16,24 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import UserCreationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import models
 
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('login')  # Przekieruj użytkownika na stronę logowania
+        return redirect('login')
 
-    unique_boxes = Card.objects.values('box').distinct()
+    unique_boxes = Box.get_unique_boxes(request.user)
+    if request.method == 'POST' and 'create_box' in request.POST:
+        Box.create_new_box(request.user)
+        return redirect('home')
+
+    if request.method == 'POST' and 'delete_box' in request.POST:
+        box_id = request.POST.get('box_id')
+        box = get_object_or_404(Box, pk=box_id, user=request.user)
+        box.delete()
+        return JsonResponse({'status': 'success'})
+
     return render(request, 'home.html', {'unique_boxes': unique_boxes})
 
 
@@ -58,6 +69,36 @@ def flashcard_program(request, box_number):
     return render(request, 'flashcard_program.html', context)
 
 
+def create_new_box(request):
+    print("PRINTUJE 1 request:", request)
+    if request.method == 'POST':
+        print("PRINTUJE 2 request.method:", request.method)
+        user = request.user  # Poprawione: dodane przypisanie `user`
+        
+        max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
+        
+        if max_box_number is not None:
+            new_box_number = max_box_number + 1
+        else:
+            new_box_number = 1
+
+        print('Drukuje max_box_number', max_box_number)
+        print('Drukuje new_box_number', new_box_number)
+
+        Box.objects.create(user=user, box_number=new_box_number)
+
+        return JsonResponse({'status': 'success', 'new_box_number': new_box_number})
+    return JsonResponse({'status': 'error'})
+
+
+def delete_box(request, box_id):
+    if request.method == 'POST':
+        box = get_object_or_404(Box, pk=box_id, user=request.user)
+        box.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'})
+
+
 @login_required
 def all_cards(request, box_number):
     unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
@@ -77,7 +118,7 @@ def edit_card(request, card_id):
 
     if request.method == 'POST':
         print("Sprawdzam request", request.body)
-        body_unicode = request.body.decode('utf-8')  # Zdekoduj ten string, bez tego nie działało
+        body_unicode = request.body.decode('utf-8')  # Decode the string, this was necessary for it to work
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
@@ -85,7 +126,7 @@ def edit_card(request, card_id):
         print('question', question)
         answer = body_data.get('answer')
         print(answer)
-        box_value = body_data.get('box', 'box1')
+        box_value = body_data.get('box')
 
         box_mapping = {
             'box1': 1,
@@ -94,10 +135,11 @@ def edit_card(request, card_id):
         }
         box = box_mapping.get(box_value, 1)
 
-        if question and answer and box in BOXES:
+        if question and answer and box in range(1, Box.objects.count() + 1):
             card.question = question
             card.answer = answer
-            card.box = box
+            card.box.box_number = box
+            card.box.save()
             card.save()
             return JsonResponse({'status': 'success'})
         else:
@@ -117,32 +159,20 @@ def delete_card(request, card_id):
 
 @login_required
 def create_new_card(request):
-    print("request", request)
-    unique_boxes = Card.objects.values('box').distinct()
-    print("unique bxes drukuje", unique_boxes)
+    unique_boxes = Box.objects.filter(user=request.user).values('box_number')
+
     if request.method == 'POST':
-        print("request", request)
         question = request.POST.get('question')
         answer = request.POST.get('answer')
-        box_value = request.POST.get('box', 'box1')
-        print("printuje: ", question, answer, box_value)
+        box_number = request.POST.get('box')
 
-        box_mapping = {
-            'box1': 1,
-            'box2': 2,
-            'box3': 3,
-        }
-        box = box_mapping.get(box_value, 1)
-
-        if request.user.is_authenticated:
-            user = request.user
-            print('DRUKUJE user:', user)
-            print("USER ID:", user.id)
-            Card.objects.create(user=user, question=question, answer=answer, box=box)
+        if question and answer and box_number:
+            box = get_object_or_404(Box, user=request.user, box_number=box_number)
+            new_card = Card.objects.create(user=request.user, question=question, answer=answer, box=box)
             added = True
-            return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
+            return render(request, 'create_new_card.html', {'added': added, 'new_card': new_card})
         else:
-            pass
+            return JsonResponse({'status': 'error'})
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
 
