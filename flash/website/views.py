@@ -23,7 +23,6 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    unique_boxes = Box.get_unique_boxes(request.user)
     if request.method == 'POST' and 'create_box' in request.POST:
         Box.create_new_box(request.user)
         return redirect('home')
@@ -32,7 +31,9 @@ def home(request):
         box_id = request.POST.get('box_id')
         box = get_object_or_404(Box, pk=box_id, user=request.user)
         box.delete()
-        return JsonResponse({'status': 'success'})
+
+    # Fetch unique boxes for the logged-in user
+    unique_boxes = Box.get_unique_boxes(request.user)
 
     return render(request, 'home.html', {'unique_boxes': unique_boxes})
 
@@ -86,14 +87,15 @@ def create_new_box(request):
         print('Drukuje new_box_number', new_box_number)
 
         Box.objects.create(user=user, box_number=new_box_number)
+        unique_boxes = Box.get_unique_boxes(request.user)
 
-        return JsonResponse({'status': 'success', 'new_box_number': new_box_number})
+        return JsonResponse({'status': 'success', 'new_box_number': new_box_number, 'unique_boxes': list(unique_boxes)})
     return JsonResponse({'status': 'error'})
 
 
-def delete_box(request, box_id):
+def delete_box(request, box_number):
     if request.method == 'POST':
-        box = get_object_or_404(Box, pk=box_id, user=request.user)
+        box = Box.objects.get(user=request.user, box_number=box_number)
         box.delete()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'})
