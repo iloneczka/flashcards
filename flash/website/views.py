@@ -40,18 +40,30 @@ def home(request):
 
 @login_required
 def flashcard_program(request, box_number):
+    unique_boxes = Box.get_unique_boxes(request.user)
+
+    if request.method == 'POST':
+        box_number = request.POST.get('box_number')
+
     if box_number == "0":
-        random_card = Card.objects.get_random_card_based_on_rating()
+        random_card = Card.objects.filter(user=request.user).order_by('?').first()
     else:
-        random_card = Card.objects.filter(user=request.user, box__box_number=box_number).get_random_card_based_on_rating()
+        try:
+            box_number = int(box_number)
+            cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+            random_card = cards.first()
+        except (ValueError, Card.DoesNotExist):
+            random_card = None
 
     context = {
-        'random_card': random_card,
         'box_number': box_number,
+        'random_card': random_card,
+        'unique_boxes': unique_boxes,
         'no_cards': not random_card,
     }
 
     return render(request, 'flashcard_program.html', context)
+
 
 
 def create_new_box(request):
