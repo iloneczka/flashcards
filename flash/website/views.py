@@ -40,32 +40,16 @@ def home(request):
 
 @login_required
 def flashcard_program(request, box_number):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
-
-    if request.method == 'POST':
-        box_number = request.POST.get('box_number')
-
-    all_cards = Card.objects.filter(user=request.user)
-
-    if box_number == '0':
-        cards = all_cards
+    if box_number == "0":
+        random_card = Card.objects.get_random_card_based_on_rating()
     else:
-        try:
-            box_number = int(box_number)
-            cards = all_cards.filter(box=box_number)
-        except ValueError:
-            cards = Card.objects.none()
-
-    random_card = cards.order_by('?').first()
+        random_card = Card.objects.filter(user=request.user, box__box_number=box_number).get_random_card_based_on_rating()
 
     context = {
-        'box_number': box_number,
         'random_card': random_card,
-        'unique_boxes': unique_boxes,
+        'box_number': box_number,
+        'no_cards': not random_card,
     }
-
-    if not cards.exists():
-        context['no_cards'] = True
 
     return render(request, 'flashcard_program.html', context)
 
@@ -75,9 +59,9 @@ def create_new_box(request):
     if request.method == 'POST':
         print("PRINTUJE 2 request.method:", request.method)
         user = request.user
-        
+
         max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
-        
+
         if max_box_number is not None:
             new_box_number = max_box_number + 1
         else:
@@ -103,10 +87,11 @@ def delete_box(request, box_number):
 
 @login_required
 def all_cards(request, box_number):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
+    unique_boxes = Box.get_unique_boxes(request.user)
+    box_number = int(box_number)  # Konwertuj na liczbę całkowitą
 
     if box_number != 0:
-        cards = Card.objects.filter(user=request.user, box=box_number)
+        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
         context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
     else:
         cards = Card.objects.filter(user=request.user)

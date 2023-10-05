@@ -6,17 +6,17 @@
     <div class="container text-center">
         {% if cards %}
             <div class="row">
-                {% for box in unique_boxes reversed %}
+                {% for box in unique_boxes %}
                     <div class="col">
-                        <table class="table box-table" data-box="{{ box.box }}">
+                        <table class="table box-table" data-box="{{ box.box_number }}">
                             <thead>
                                 <tr> 
-                                    <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+                                    <th scope="col" class="box-header" colspan="2">Box {{ box.box_number }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for card in cards %}
-                                    {% if box.box == 'all' or card.box == box.box %}
+                                    {% if box.box_number == 'all' or card.box.box_number == box.box_number %}
                                         <tr>
                                             <td>
                                                 <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
@@ -36,7 +36,6 @@
             <p>No cards available. Go to <a href="{% url 'create_new_card' %}">Create New Card</a>.</p>
         {% endif %}
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const editButtons = document.querySelectorAll('.edit-card');

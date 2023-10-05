@@ -11,7 +11,7 @@ class Box(models.Model):
     def get_unique_boxes(user):
         boxes_with_cards = Box.objects.filter(user=user).values('box_number').distinct()
         return boxes_with_cards
-    
+
     @staticmethod
     def create_new_box(user):
         max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
