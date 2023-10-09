@@ -65,7 +65,6 @@ def flashcard_program(request, box_number):
     return render(request, 'flashcard_program.html', context)
 
 
-
 def create_new_box(request):
     print("PRINTUJE 1 request:", request)
     if request.method == 'POST':
@@ -215,15 +214,32 @@ def export_to_excel(request):
 
 
 def export_cards(request):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
+    unique_boxes = Box.get_unique_boxes(request.user)
     all_cards = Card.objects.filter(user=request.user)
 
     context = {
         'unique_boxes': unique_boxes,
         'all_cards': all_cards,
     }
-
+    print("Pomidor:", context)
     return render(request, 'export_cards.html', context)
+
+# def export_cards(request):
+#     selected_box = request.GET.get('selected_box', 'all')  # Pobierz wybrany box z zapytania
+
+#     unique_boxes = Box.get_unique_boxes(request.user)
+#     if selected_box != 'all':
+#         all_cards = Card.objects.filter(user=request.user, box__box_number=selected_box)
+#     else:
+#         all_cards = Card.objects.filter(user=request.user)
+
+#     context = {
+#         'unique_boxes': unique_boxes,
+#         'cards': all_cards,
+#         'selected_box': selected_box,  # Dodaj wybrany box do kontekstu
+#     }
+
+#     return render(request, 'export_cards.html', context)
 
 
 def export_to_csv(request):

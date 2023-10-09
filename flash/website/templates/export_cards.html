@@ -14,49 +14,48 @@
       font-size: 15px;   /* Przyciski*/
     }
   </style>
+
   <!-- Lista rozwijana do wyboru boxa -->
   <select class="form-select" id="box-select" aria-label="Select a box">
     <option selected value="all">All cards</option>
     <option disabled>──────────</option>
     {% for box in unique_boxes %}
-      <option value="{{ box.box }}">Box {{ box.box }}</option>
+      <option value="{{ box.box }}">Box {{ box.box_number }}</option>
     {% endfor %}
   </select>
-
-  <!-- Tabela z kartami -->
-  <div class="card-tables">
-    {% for box in unique_boxes %}
-      <table class="table box-table" data-box="{{ box.box }}">
-        <thead>
-          <tr>
-            <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
+  
+   <!-- Tabelka -->
+  <div class="col" id="card-table-container">
+    <table class="table box-table">
+      <thead>
+        <tr> 
+          <th scope="col">Question</th>
+          <th scope="col">Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for card in all_cards %}
+          <tr class="box-{{ card.box.box_number }}">
+            <td>{{ card.question }}</td>
+            <td>{{ card.answer }}</td>
           </tr>
-        </thead>
-        <tbody>
-          {% for card in all_cards %}
-            {% if box.box == 'all' or card.box == box.box %}
-              <tr>
-                <td>{{ card.question }}</td>
-                <td>{{ card.answer }}</td>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <div class="btn-success-container">
     <button class="btn btn-success" id="export-pdf-button">Export to PDF</button>
     <button class="btn btn-secondary" id="export-excel-button">Export to Excel</button>
     <button class="btn btn-success" id="export-csv-button">Export to CSV</button>
-    <button class="btn btn-secondary" id="print-button">PRINT<button>
+    <button class="btn btn-secondary" id="print-button">PRINT</button>
   </div>
 
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const boxSelect = document.getElementById('box-select');
-    const boxTables = document.querySelectorAll('.box-table');
+    const allRows = document.querySelectorAll('.box-table tbody tr');
+    const cardTables = document.querySelectorAll('.box-table');
     const exportPdfButton = document.getElementById('export-pdf-button');
     const exportExcelButton = document.getElementById('export-excel-button'); 
     const exportCsvButton = document.getElementById('export-csv-button');
@@ -64,11 +63,13 @@
 
     boxSelect.addEventListener('change', () => {
       const selectedBox = boxSelect.value;
-      boxTables.forEach((table) => {
-        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-          table.style.display = 'table';
+
+      allRows.forEach(row => {
+        const boxNumber = row.dataset.box;
+        if (selectedBox === 'all' || boxNumber === selectedBox) {
+          row.style.display = 'table-row';
         } else {
-          table.style.display = 'none';
+          row.style.display = 'none';
         }
       });
     });
@@ -159,14 +160,15 @@
     });
 
     printButton.addEventListener('click', () => {
-      const selectedBox = boxSelect.value;
-      boxTables.forEach((table) => {
-        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-          table.style.display = 'table';
+    const selectedBox = boxSelect.value;
+    cardTables.forEach((table) => {
+        const boxNumber = table.dataset.box;
+        if (selectedBox === 'all' || boxNumber === selectedBox) {
+            table.style.display = 'table';
         } else {
-          table.style.display = 'none';
+            table.style.display = 'none';
         }
-      });
+    });
       document.getElementById('box-select').style.display = 'none';
       document.querySelector('h1').style.display = 'none';
       exportPdfButton.style.display = 'none'; // Ukryj przyciski
