@@ -215,31 +215,17 @@ def export_to_excel(request):
 
 def export_cards(request):
     unique_boxes = Box.get_unique_boxes(request.user)
-    all_cards = Card.objects.filter(user=request.user)
+    
+    option = request.GET.get('option', None)
 
-    context = {
-        'unique_boxes': unique_boxes,
-        'all_cards': all_cards,
-    }
-    print("Pomidor:", context)
+    if option is not None and option.isnumeric():
+        box_number = int(option)
+        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+    else:
+        cards = Card.objects.filter(user=request.user)
+
+    context = {'cards': cards, 'unique_boxes': unique_boxes}
     return render(request, 'export_cards.html', context)
-
-# def export_cards(request):
-#     selected_box = request.GET.get('selected_box', 'all')  # Pobierz wybrany box z zapytania
-
-#     unique_boxes = Box.get_unique_boxes(request.user)
-#     if selected_box != 'all':
-#         all_cards = Card.objects.filter(user=request.user, box__box_number=selected_box)
-#     else:
-#         all_cards = Card.objects.filter(user=request.user)
-
-#     context = {
-#         'unique_boxes': unique_boxes,
-#         'cards': all_cards,
-#         'selected_box': selected_box,  # Dodaj wybrany box do kontekstu
-#     }
-
-#     return render(request, 'export_cards.html', context)
 
 
 def export_to_csv(request):
