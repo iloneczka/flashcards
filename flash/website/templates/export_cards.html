@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const boxNumber = table.dataset.box;
 
     if (selected_option === 'all' || boxNumber === selected_option) {
-      table.style.removeProperty('display'); // Usunięcie display: zmianilo mi styl i ustawienie elementów tabeli. 
+      table.style.removeProperty('display'); // Usunięcie display: zmianilo mi styl i ustawienie elementów tabeli.
     } else {
       table.style.display = 'none';
     }
@@ -158,12 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     printButton.addEventListener('click', () => {
     const selectedBox = boxSelect.value;
+    
     cardTables.forEach((table) => {
         const boxNumber = table.dataset.box;
         if (selectedBox === 'all' || boxNumber === selectedBox) {
-            table.style.display = 'table';
+            table.classList.add('print-show'); // Dodaj klasę 'print-show'
         } else {
-            table.style.display = 'none';
+            table.classList.remove('print-show'); // Usuń klasę 'print-show'
         }
     });
       document.getElementById('box-select').style.display = 'none';

@@ -318,22 +318,10 @@ def print_table(request):
         template = get_template('print_template.html')
         template.render(context)
 
-        buffer = BytesIO()
-
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-
-        # Prepare the PDF content, such as a table, using reportlab
-        elements = []
-        elements.append(Table([['Card', 'Answer']] + [[card.question, card.answer] for card in all_cards]))
-        doc.build(elements)
-
-        # Set HTTP response headers
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
+        response['Content-Disposition'] = 'inline; filename="cards.pdf"'
 
-        # Save the PDF content to the HTTP response
-        buffer.seek(0)
-        response.write(buffer.read())
+        pdfkit.from_string(rendered_template, response)
 
         return response
 
