@@ -25,12 +25,11 @@
 </select>
 
 <!-- Tabela -->
-<table id="card-table" border="1">
+<table class="table">
   <thead>
     <tr>
-      <th>Question</th>
-      <th>Answer</th>
-      <th>Box Number</th>
+      <th scope="col">Question</th>
+      <th scope="col">Answer</th>
     </tr>
   </thead>
   <tbody>
@@ -38,7 +37,6 @@
       <tr class="box-table" data-box="{{ card.box.box_number }}">
         <td>{{ card.question }}</td>
         <td>{{ card.answer }}</td>
-        <td class="box-number">{{ card.box.box_number }}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -61,18 +59,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const printButton = document.getElementById('print-button');
 
   boxSelect.addEventListener('change', function () {
-    const selected_option = this.value;
+  const selected_option = this.value;
 
-    cardTables.forEach((table) => {
-      const boxNumber = table.dataset.box;
+  cardTables.forEach((table) => {
+    const boxNumber = table.dataset.box;
 
-      if (selected_option === 'all' || boxNumber === selected_option) {
-        table.style.display = 'table';
-      } else {
-        table.style.display = 'none';
-      }
-    });
+    if (selected_option === 'all' || boxNumber === selected_option) {
+      table.style.removeProperty('display'); // Usunięcie display: zmianilo mi styl i ustawienie elementów tabeli. 
+    } else {
+      table.style.display = 'none';
+    }
   });
+});
     exportExcelButton.addEventListener('click', () => {
       const selectedBox = boxSelect.value; // Pobierz wybrany box
       const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
@@ -195,7 +193,9 @@ document.addEventListener('DOMContentLoaded', function () {
       font-size: 25px;
       color: black;
     }  
-    
+    .table th, .table td {
+      width: 50px; /* lub inna stała szerokość, która pasuje do Twoich danych */
+    }     
     .question, .answer, .card-label, .card-input, .card-button {
       font-size: 25px;
     }
