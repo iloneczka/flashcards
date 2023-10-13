@@ -17,6 +17,7 @@ from .forms import UserCreationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
+import pdfkit
 
 
 def home(request):
@@ -215,7 +216,7 @@ def export_to_excel(request):
 
 def export_cards(request):
     unique_boxes = Box.get_unique_boxes(request.user)
-    
+
     option = request.GET.get('option', None)
 
     if option is not None and option.isnumeric():
@@ -259,41 +260,26 @@ def export_to_pdf(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        print('body_data', body_data)
-
         selected_box = body_data.get('selected_box')
 
+        all_cards = Card.objects.filter(user=request.user)
+
         if selected_box == 'all':
-            all_cards = Card.objects.filter(user=request.user)
+            all_cards = Card.objects.all()
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(box=selected_box)
+
+        context = {
+            'all_cards': all_cards,
+        }
+
+        template = get_template('print_template.html')
+        rendered_template = template.render(context)
 
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
+        response['Content-Disposition'] = 'inline; filename="cards.pdf"'
 
-        doc = SimpleDocTemplate(response, pagesize=landscape(letter))
-        data = [[card.question, card.answer] for card in all_cards]
-
-        # Create the table
-        table = Table(data)
-        style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust
-            ('RIGHTPADDING', (0, 1), (-1, -1), 10),
-            ('COLWIDTH', (0, 0), (-1, -1), 100),
-        ])
-
-        table.setStyle(style)
-
-        elements = []
-        elements.append(table)
-        doc.build(elements)
+        pdfkit.from_string(rendered_template, response)
 
         return response
 
@@ -316,7 +302,7 @@ def print_table(request):
         }
 
         template = get_template('print_template.html')
-        template.render(context)
+        rendered_template = template.render(context)  # Define rendered_template
 
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="cards.pdf"'

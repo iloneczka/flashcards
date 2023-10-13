@@ -110,6 +110,7 @@ XlsxWriter==3.1.2
 psycopg2-binary==2.9.6
 gunicorn==21.2.0
 flake8==6.0.0
+pdfkit==1.0.0
 ```
 ## Usage
 
