@@ -165,12 +165,11 @@ def move_card(request, card_id):
 
         user_boxes = Box.objects.filter(user=request.user)
         available_boxes = user_boxes.values_list('box_number', flat=True)
-        print( "available_boxes", list(available_boxes))
-        print( "warunek", int(new_box_number) in list(available_boxes))
+        print("available_boxes", list(available_boxes))
+        print("warunek", int(new_box_number) in list(available_boxes))
         if int(new_box_number) in list(available_boxes):
             card.box = user_boxes.get(box_number=new_box_number)
             card.save()
-            print( "JESTEM W SUKCESIE")
             return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
         else:
             return JsonResponse({'status': 'error', 'available_boxes': list(available_boxes)})
@@ -196,15 +195,13 @@ def delete_card(request, card_id):
 @login_required
 def create_new_card(request):
     unique_boxes = Box.objects.filter(user=request.user).values('box_number')
-    
+
     if not unique_boxes:  # Jeśli unique_boxes jest puste
         # Utwórz nowe pudełko
         new_box = Box.objects.create(user=request.user, box_number=1)  # Możesz ustawić odpowiedni numer pudełka
-        
         box_number = new_box.box_number
-        
         unique_boxes = [{'box_number': box_number}]
-        
+
     if request.method == 'POST':
         question = request.POST.get('question')
         answer = request.POST.get('answer')
@@ -219,7 +216,6 @@ def create_new_card(request):
             return JsonResponse({'status': 'error'})
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
-
 
 
 def export_cards(request):
@@ -249,7 +245,7 @@ def export_to_excel(request):
         if selected_box == 'all':
             all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
         # Tworzenie pliku Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -287,7 +283,7 @@ def export_to_csv(request):
         if selected_box == 'all':
             all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
         # Tworzenie pliku CSV
         response = HttpResponse(content_type='text/csv')
@@ -304,28 +300,48 @@ def export_to_csv(request):
 
 def export_to_pdf(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
+        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
         body_data = json.loads(body_unicode)
+        print('body_data', body_data)
+
         selected_box = body_data.get('selected_box')
-
-        all_cards = Card.objects.filter(user=request.user)
-
+        print(request.POST)
+        print(selected_box)
+        # Pobierz dane kart z wybranego boxa lub wszystkie karty
         if selected_box == 'all':
-            all_cards = Card.objects.all()
+            all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
-        context = {
-            'all_cards': all_cards,
-        }
-
-        template = get_template('print_template.html')
-        rendered_template = template.render(context)
-
+        # Create the PDF document
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="cards.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
 
-        pdfkit.from_string(rendered_template, response)
+        doc = SimpleDocTemplate(response, pagesize=landscape(letter))
+        data = [[card.question, card.answer] for card in all_cards]
+        print(data)
+
+        # Create the table
+        table = Table(data)
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust left padding for data cells
+            ('RIGHTPADDING', (0, 1), (-1, -1), 10),  # Adjust right padding for data cells
+            ('COLWIDTH', (0, 0), (-1, -1), 100),  # Adjust column width for all columns
+        ])
+
+        table.setStyle(style)
+
+        # Build the PDF
+        elements = []
+        elements.append(table)
+        doc.build(elements)
 
         return response
 
