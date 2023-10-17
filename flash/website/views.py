@@ -196,7 +196,15 @@ def delete_card(request, card_id):
 @login_required
 def create_new_card(request):
     unique_boxes = Box.objects.filter(user=request.user).values('box_number')
-
+    
+    if not unique_boxes:  # Jeśli unique_boxes jest puste
+        # Utwórz nowe pudełko
+        new_box = Box.objects.create(user=request.user, box_number=1)  # Możesz ustawić odpowiedni numer pudełka
+        
+        box_number = new_box.box_number
+        
+        unique_boxes = [{'box_number': box_number}]
+        
     if request.method == 'POST':
         question = request.POST.get('question')
         answer = request.POST.get('answer')
@@ -211,6 +219,7 @@ def create_new_card(request):
             return JsonResponse({'status': 'error'})
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
+
 
 
 def export_cards(request):

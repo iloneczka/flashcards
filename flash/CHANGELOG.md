@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 ## Version 0.13 (2023.10.17)
 ### Edited
 - MOVE button
+### Added
+- Automated Box Creation in Case of No Existing Boxes When Creating the First Card
 
 ## Version 0.12 (2023.10.13)
 ### Edited
