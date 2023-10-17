@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## Version 0.13 (2023.10.17)
+### Edited
+- MOVE button
+
 ## Version 0.12 (2023.10.13)
 ### Edited
 - `all_cards.html` changed to `user_panel.html`

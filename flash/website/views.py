@@ -160,16 +160,28 @@ def move_card(request, card_id):
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         new_box_number = body_data.get('box_number')
+        print(request, "-request PRINTUJE")
+        print(new_box_number, "-new_box_number PRINTUJE")
 
-        # Sprawdź, czy nowy numer pudełka jest prawidłowy
-        if new_box_number in Box.objects.filter(user=request.user).values_list('box_number', flat=True):
-            card.box.box_number = new_box_number
-            card.box.save()
-            return JsonResponse({'status': 'success'})
+        user_boxes = Box.objects.filter(user=request.user)
+        available_boxes = user_boxes.values_list('box_number', flat=True)
+        print( "available_boxes", list(available_boxes))
+        print( "warunek", int(new_box_number) in list(available_boxes))
+        if int(new_box_number) in list(available_boxes):
+            card.box = user_boxes.get(box_number=new_box_number)
+            card.save()
+            print( "JESTEM W SUKCESIE")
+            return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
         else:
-            return JsonResponse({'status': 'error'})
+            return JsonResponse({'status': 'error', 'available_boxes': list(available_boxes)})
 
     return JsonResponse({'status': 'error'})
+
+
+def get_available_boxes(request):
+    user_boxes = Box.objects.filter(user=request.user)
+    available_boxes = user_boxes.values_list('box_number', flat=True)
+    return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
 
 
 def delete_card(request, card_id):

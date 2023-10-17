@@ -26,4 +26,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('create_new_box/', views.create_new_box, name='create_new_box'),
     path('delete_box/<int:box_number>/', views.delete_box, name='delete_box'),
+    path('get_available_boxes/', views.get_available_boxes, name='get_available_boxes'),
 ]

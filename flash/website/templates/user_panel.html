@@ -10,11 +10,11 @@
         <div id="list-example" class="list-group">
             {% for box in unique_boxes %}
             <a class="list-group-item list-group-item-action box-link {% if box.box_number == selected_box_number %}active{% endif %}" href="#" data-box-number="{{ box.box_number }}">
-                    <div class="box-image">
-                        <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
-                        <span class="box-number">Box {{ box.box_number }}</span>
-                    </div>
-                </a>
+                <div class="box-image">
+                    <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
+                    <span class="box-number">Box {{ box.box_number }}</span>
+                </div>
+            </a>
             {% endfor %}
         </div>
     </div>
@@ -43,6 +43,7 @@
                                     <h1 style="font-size: 20px;">No cards available in this box.</h1>
                                     <form action="{% url 'create_new_card' %}" method="get" style="display:inline;">
                                         <button type="submit" class="btn btn-success">Create New Card</button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endif %}
@@ -98,17 +99,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     cardTables.forEach((table) => {
-    const boxNumber = table.dataset.boxNumber;
-    console.log(`table.dataset: = ${table.dataset.boxNumber}`);
-    if (selected_box_number === boxNumber) {
-        table.style.display = 'block';
-        table.style.removeProperty('display'); // Dodane wywołanie
-        const boxLink = document.querySelector(`.box-link[data-box-number="${boxNumber}"]`);
-        boxLink.classList.add('active');
-    } else {
-        table.style.display = 'none';
-    }
-});
+        const boxNumber = table.dataset.boxNumber;
+        console.log(`table.dataset: = ${table.dataset.boxNumber}`);
+        if (selected_box_number === boxNumber) {
+            table.style.display = 'block';
+            table.style.removeProperty('display'); // Dodane wywołanie
+            const boxLink = document.querySelector(`.box-link[data-box-number="${boxNumber}"]`);
+            boxLink.classList.add('active');
+        } else {
+            table.style.display = 'none';
+        }
+    });
 
     if (boxLinks.length > 0) {
         boxLinks[0].click();
@@ -134,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', (event) => {
             event.preventDefault();
             const cardId = button.getAttribute('data-card-id');
-            moveCard(cardId);
+            moveCardPrompt(cardId);
         });
     });
 
@@ -188,48 +189,91 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function moveCard(cardId) {
-        const newBox = prompt('Enter the target box (box1, box2, box3):');
-
-        if (newBox !== null) {
-            const requestData = {
-                box: newBox
-            };
-
-            fetch(`/move_card/${cardId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify(requestData)
-            })
+    function moveCardPrompt(cardId) {
+        fetch('/get_available_boxes/')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
-                    const boxElement = cardElement.querySelector('.box');
-                    window.location.reload();
+                    const availableBoxes = data.available_boxes;
+                    if (availableBoxes.length > 1) {
+                        const newBox = prompt(`Enter the target box (${availableBoxes.join(', ')}):`);
+                        if (newBox !== null) {
+                            moveCard(cardId, newBox);
+                        }
+                    } else {
+                        alert("Can't move this card. You don't have other boxes.");
+                    }
                 }
             });
+    }
+
+    function moveCard(cardId, newBox) {
+        const csrfToken = getCookie('csrftoken');
+
+        if (!csrfToken) {
+            alert('CSRF token not found. Please try again later.');
+            return;
         }
+
+        fetch(`/move_card/${cardId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({'box_number': newBox})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('moveCardPrompt 2!!!')
+            if (data.status === 'success') {
+                alert('Card moved successfully');
+                window.location.reload();
+            } else {
+                alert('Error moving card');
+                showAvailableBoxes(data.available_boxes);
+            }
+        });
+    }
+
+
+    function showAvailableBoxes(availableBoxes) {
+        var message = "Available boxes: " + availableBoxes.join(", ");
+        alert(message);
+    }
+
+    // Dodane dla dynamicznego wyświetlania dostępnych pudełek
+    function updateAvailableBoxes() {
+        fetch('/get_available_boxes/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAvailableBoxes(data.available_boxes);
+            }
+        });
     }
 });
 
-    </script>
+function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+</script>
+
+
 <style type="text/css">
     .card-info {
         font-size: 15px;
         color: black;
     }
 
-    /* Powiększenie tekstu w question i answer */
     .question, .answer {
         font-size: 15px;
     }
 
     .btn {
-        font-size: 15px;   /* Przyciski*/
+        font-size: 15px;
     }
 
     .box-image {
@@ -246,8 +290,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     .list-group-item.active {
-        background-color: #007bff; /* Kolor podświetlenia */
-        color: #fff; /* Kolor tekstu */
+        background-color: #007bff;
+        color: #fff;
     }
 </style>
 {% endblock %}
