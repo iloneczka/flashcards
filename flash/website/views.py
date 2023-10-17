@@ -98,53 +98,73 @@ def delete_box(request, box_number):
 
 
 @login_required
-def all_cards(request, box_number):
+def all_cards(request, box_number=None):
     unique_boxes = Box.get_unique_boxes(request.user)
-    box_number = int(box_number)  # Konwertuj na liczbę całkowitą
 
-    if box_number != 0:
-        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
-        context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
+    if box_number is not None:
+        box_number = int(box_number)  # Konwertuj na liczbę całkowitą
+
+        if box_number != 0:
+            cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+            context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
+        else:
+            cards = Card.objects.filter(user=request.user)
+            context = {'cards': cards, 'unique_boxes': unique_boxes}
     else:
-        cards = Card.objects.filter(user=request.user)
-        context = {'cards': cards, 'unique_boxes': unique_boxes}
+        context = {'unique_boxes': unique_boxes}
 
-    return render(request, 'all_cards.html', context)
+    return render(request, 'user_panel.html', context)
+
+
+@login_required
+def user_panel(request):
+    unique_boxes = Box.get_unique_boxes(request.user)
+    cards = Card.objects.filter(user=request.user)
+
+    context = {'cards': cards, 'unique_boxes': unique_boxes}
+    print('context:', context)
+
+    return render(request, 'user_panel.html', context)
 
 
 def edit_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
 
     if request.method == 'POST':
-        print("Sprawdzam request", request.body)
-        body_unicode = request.body.decode('utf-8')  # Decode the string, this was necessary for it to work
+        body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        print('body_data', body_data)
 
         question = body_data.get('question')
-        print('question', question)
         answer = body_data.get('answer')
-        print(answer)
-        box_value = body_data.get('box')
 
-        box_mapping = {
-            'box1': 1,
-            'box2': 2,
-            'box3': 3,
-        }
-        box = box_mapping.get(box_value, 1)
-
-        if question and answer and box in range(1, Box.objects.count() + 1):
+        if question and answer:
             card.question = question
             card.answer = answer
-            card.box.box_number = box
-            card.box.save()
             card.save()
             return JsonResponse({'status': 'success'})
         else:
             return JsonResponse({'status': 'error'})
 
     return render(request, 'edit_card.html', {'card': card})
+
+
+def move_card(request, card_id):
+    card = get_object_or_404(Card, pk=card_id)
+
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        new_box_number = body_data.get('box_number')
+
+        # Sprawdź, czy nowy numer pudełka jest prawidłowy
+        if new_box_number in Box.objects.filter(user=request.user).values_list('box_number', flat=True):
+            card.box.box_number = new_box_number
+            card.box.save()
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error'})
+
+    return JsonResponse({'status': 'error'})
 
 
 def delete_card(request, card_id):
@@ -174,6 +194,21 @@ def create_new_card(request):
             return JsonResponse({'status': 'error'})
 
     return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
+
+
+def export_cards(request):
+    unique_boxes = Box.get_unique_boxes(request.user)
+
+    option = request.GET.get('option', None)
+
+    if option is not None and option.isnumeric():
+        box_number = int(option)
+        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+    else:
+        cards = Card.objects.filter(user=request.user)
+
+    context = {'cards': cards, 'unique_boxes': unique_boxes}
+    return render(request, 'export_cards.html', context)
 
 
 def export_to_excel(request):
@@ -212,21 +247,6 @@ def export_to_excel(request):
         workbook.close()
 
         return response
-
-
-def export_cards(request):
-    unique_boxes = Box.get_unique_boxes(request.user)
-
-    option = request.GET.get('option', None)
-
-    if option is not None and option.isnumeric():
-        box_number = int(option)
-        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
-    else:
-        cards = Card.objects.filter(user=request.user)
-
-    context = {'cards': cards, 'unique_boxes': unique_boxes}
-    return render(request, 'export_cards.html', context)
 
 
 def export_to_csv(request):

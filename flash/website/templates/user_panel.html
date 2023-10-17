@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block 'content' %}
+<h1 style="font-size: 25px;">User Panel</h1>
+<br/>
+<div class="row">
+    <div class="col-4">
+        <div id="list-example" class="list-group">
+            {% for box in unique_boxes %}
+            <a class="list-group-item list-group-item-action box-link {% if box.box_number == selected_box_number %}active{% endif %}" href="#" data-box-number="{{ box.box_number }}">
+                    <div class="box-image">
+                        <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
+                        <span class="box-number">Box {{ box.box_number }}</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="card-list">
+            {% for box in unique_boxes %}
+                <div class="box-section" data-box-number="{{ box.box_number }}" style="display: none;" id="box-{{ box.box_number }}">
+                    <table class="table">
+                        <tr>
+                            <th scope="col" class="box-header" colspan="2">Box {{ box.box_number }}</th>
+                        </tr>
+                        {% for card in cards  %}
+                            {% if card.box.box_number == box.box_number %}
+                            <tr>
+                                <td>
+                                    <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
+                                    <p class="card-info">Answer: <span class="answer">{{ card.answer }}</span></p>
+                                    <a type="submit" href="#" class="btn btn-info edit-card" data-card-id="{{ card.pk }}">Edit</a>
+                                    <a type="submit" href="#" class="btn btn-info delete-card" data-card-id="{{ card.pk }}">Delete</a>
+                                    <a type="submit" href="#" class="btn btn-info move-card" data-card-id="{{ card.pk }}">Move</a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let selected_box_number = null;
+
+    const editButtons = document.querySelectorAll('.edit-card');
+    const deleteButtons = document.querySelectorAll('.delete-card');
+    const moveButtons = document.querySelectorAll('.move-card');
+    const boxLinks = document.querySelectorAll('.box-link');
+    const cardTables = document.querySelectorAll('.box-section');
+
+    function displayBoxCards(boxNumber) {
+        console.log(`Wywołano displayBoxCards z boxNumber = ${boxNumber} sbn: ${selected_box_number}`);
+        
+        const allCards = document.querySelectorAll('.box-section');
+        allCards.forEach(card => {
+            card.style.display = 'none';
+        });
+
+        const cards = document.querySelector(`#box-${boxNumber}`);
+        cards.style.display = 'block';
+    }
+
+    boxLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const boxNumber = link.dataset.boxNumber;
+            console.log(`Kliknięto box numer: ${boxNumber}`);
+
+            if (selected_box_number === boxNumber) {
+                selected_box_number = null;
+            } else {
+                selected_box_number = boxNumber;
+            }
+
+            displayBoxCards(boxNumber);
+
+            boxLinks.forEach(l => {
+                l.classList.remove('active');
+            });
+
+            link.classList.toggle('active');
+        });
+    });
+
+    cardTables.forEach((table) => {
+    const boxNumber = table.dataset.boxNumber;
+    console.log(`table.dataset: = ${table.dataset.boxNumber}`);
+    if (selected_box_number === boxNumber) {
+        table.style.display = 'block';
+        table.style.removeProperty('display'); // Dodane wywołanie
+        const boxLink = document.querySelector(`.box-link[data-box-number="${boxNumber}"]`);
+        boxLink.classList.add('active');
+    } else {
+        table.style.display = 'none';
+    }
+});
+
+    if (boxLinks.length > 0) {
+        boxLinks[0].click();
+    }
+
+    editButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const cardId = button.getAttribute('data-card-id');
+            editCard(cardId);
+        });
+    });
+
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const cardId = button.getAttribute('data-card-id');
+            deleteCard(cardId);
+        });
+    });
+
+    moveButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const cardId = button.getAttribute('data-card-id');
+            moveCard(cardId);
+        });
+    });
+
+    function editCard(cardId) {
+        const newQuestion = prompt('Enter the new question:');
+        const newAnswer = prompt('Enter the new answer:');
+
+        if (newQuestion !== null && newAnswer !== null) {
+            const requestData = {
+                question: newQuestion,
+                answer: newAnswer
+            };
+
+            fetch(`/edit_card/${cardId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+                    const questionElement = cardElement.querySelector('.question');
+                    const answerElement = cardElement.querySelector('.answer');
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    function deleteCard(cardId) {
+        const confirmDelete = confirm('Are you sure you want to delete this card?');
+
+        if (confirmDelete) {
+            fetch(`/delete_card/${cardId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken':  '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    function moveCard(cardId) {
+        const newBox = prompt('Enter the target box (box1, box2, box3):');
+
+        if (newBox !== null) {
+            const requestData = {
+                box: newBox
+            };
+
+            fetch(`/move_card/${cardId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+                    const boxElement = cardElement.querySelector('.box');
+                    window.location.reload();
+                }
+            });
+        }
+    }
+});
+
+    </script>
+<style type="text/css">
+    .card-info {
+        font-size: 15px;
+        color: black;
+    }
+
+    /* Powiększenie tekstu w question i answer */
+    .question, .answer {
+        font-size: 15px;
+    }
+
+    .btn {
+        font-size: 15px;   /* Przyciski*/
+    }
+
+    .box-image {
+        position: relative;
+    }
+
+    .box-number {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 20px;
+        color: black;
+    }
+
+    .list-group-item.active {
+        background-color: #007bff; /* Kolor podświetlenia */
+        color: #fff; /* Kolor tekstu */
+    }
+</style>
+{% endblock %}
