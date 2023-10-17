@@ -8,19 +8,29 @@
 <div class="row">
     <div class="col-4">
         <div id="list-example" class="list-group">
-            {% for box in unique_boxes %}
-            <a class="list-group-item list-group-item-action box-link {% if box.box_number == selected_box_number %}active{% endif %}" href="#" data-box-number="{{ box.box_number }}">
-                <div class="box-image">
-                    <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
-                    <span class="box-number">Box {{ box.box_number }}</span>
-                </div>
-            </a>
-            {% endfor %}
+            {% if unique_boxes %}
+                {% for box in unique_boxes %}
+                    <a class="list-group-item list-group-item-action box-link {% if box.box_number == selected_box_number %}active{% endif %}" href="#" data-box-number="{{ box.box_number }}">
+                        <div class="box-image">
+                            <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
+                            <span class="box-number">Box {{ box.box_number }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <h2 style="font-size: 15px;">Your User Panel is empty. Start the flashcard program and create your first card!
+                    Go to:
+                    <form action="{% url 'create_new_card' %}" method="get" style="display:inline;">
+                        <button type="submit" class="btn btn-success">Create New Card</button>
+                    </form>
+                </h2>
+            {% endif %}
         </div>
     </div>
     <div class="col-8">
         <div class="card-list">
-            {% for box in unique_boxes %}
+            {% if unique_boxes %}
+                {% for box in unique_boxes %}
                 <div class="box-section" data-box-number="{{ box.box_number }}" style="display: none;" id="box-{{ box.box_number }}">
                     <table class="table">
                         <tr>
@@ -49,9 +59,12 @@
                         {% endif %}
                     </table>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
+</div>
+</div>
 </div>
 
 <script>
