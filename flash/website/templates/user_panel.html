@@ -26,8 +26,7 @@
                         <tr>
                             <th scope="col" class="box-header" colspan="2">Box {{ box.box_number }}</th>
                         </tr>
-                        {% for card in cards  %}
-                            {% if card.box.box_number == box.box_number %}
+                        {% for card in box.cards %}
                             <tr>
                                 <td>
                                     <p class="card-info">Question: <span class="question">{{ card.question }}</span></p>
@@ -37,8 +36,16 @@
                                     <a type="submit" href="#" class="btn btn-info move-card" data-card-id="{{ card.pk }}">Move</a>
                                 </td>
                             </tr>
-                            {% endif %}
                         {% endfor %}
+                        {% if not box.cards|length %}
+                            <tr>
+                                <td colspan="2">
+                                    <h1 style="font-size: 20px;">No cards available in this box.</h1>
+                                    <form action="{% url 'create_new_card' %}" method="get" style="display:inline;">
+                                        <button type="submit" class="btn btn-success">Create New Card</button>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </table>
                 </div>
             {% endfor %}

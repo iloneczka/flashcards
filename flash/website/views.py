@@ -119,9 +119,14 @@ def all_cards(request, box_number=None):
 @login_required
 def user_panel(request):
     unique_boxes = Box.get_unique_boxes(request.user)
-    cards = Card.objects.filter(user=request.user)
+    for box in unique_boxes:
+        print(f"box: {box}")
+        box['cards'] = Card.objects.filter(user=request.user, box__box_number=box.get('box_number'))
+    # cards = Card.objects.filter(user=request.user)
 
-    context = {'cards': cards, 'unique_boxes': unique_boxes}
+    # context = {'cards': cards, 'unique_boxes': unique_boxes}
+    # print(f"boxes hopefully with cards...: {unique_boxes}")
+    context = {'unique_boxes': unique_boxes}
     print('context:', context)
 
     return render(request, 'user_panel.html', context)
