@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 from django.db.models import Count
-from website.models import Box
 
 
 def fix_migration_0002_errors(apps, schema_editor):
@@ -32,7 +31,7 @@ def fix_migration_0002_errors(apps, schema_editor):
                     card.save()
 
     empty_boxes = Box.objects.annotate(num_cards=Count('card')).filter(num_cards=0)
-    
+
     for box in empty_boxes:
         box.delete()
 
