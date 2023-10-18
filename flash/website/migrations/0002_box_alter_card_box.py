@@ -5,6 +5,20 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def create_boxes_for_existing_cards(apps, schema_editor):
+    Card = apps.get_model('website', 'Card')
+    Box = apps.get_model('website', 'Box')
+
+    for card in Card.objects.all():
+        # Tworzymy nowy obiekt Box
+        box = Box.objects.create(user=card.user, box_number=card.box)
+        print(f"Creating box based on previous data: {box}")
+
+        # Ustawiamy box w Card
+        # card.box = box
+        # card.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,6 +35,7 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        migrations.RunPython(create_boxes_for_existing_cards),
         migrations.AlterField(
             model_name='card',
             name='box',
