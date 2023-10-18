@@ -18,7 +18,8 @@
                     </a>
                 {% endfor %}
             {% else %}
-                <h2 style="font-size: 15px;">Your User Panel is empty. Start the flashcard program and create your first card!
+                <h2 style="font-size: 18px;">Your User Panel is empty. Create your first card!
+                    <br/>
                     Go to:
                     <form action="{% url 'create_new_card' %}" method="get" style="display:inline;">
                         <button type="submit" class="btn btn-success">Create New Card</button>
