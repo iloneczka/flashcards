@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
-from .serializers import CourseSerializer
+from .serializers import CardSerializer, BoxSerializer
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
 from website.models import Card, Box
@@ -26,8 +26,9 @@ class CardView(viewsets.ModelViewSet):
     serializer_class = CardSerializer
     queryset = Card.objects.all()
 
+
 class BoxView(viewsets.ModelViewSet):
-    serializer_class = CardSerializer
+    serializer_class = BoxSerializer
     queryset = Box.objects.all()
 
 

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 
 
+## Version 0.14 (2023.10.31)
+### Added
+- Integrated Django Rest Framework into the project by adding it to INSTALLED_APPS in settings.
+- Created a `serializers.py` file for data serialization.
+- Initial version of the API has been implemented.
+### Changed
+- Implemented `CardView` and `BoxView` as a `ModelViewSet` to handle API operations for the `Card` and `Box` model.
+- Integrated the API view with existing views in `views.py`.
+- Updated the `urls.py` file to include new API endpoints.
+
 ## Version 0.13 (2023.10.17)
 ### Edited
 - MOVE button
