@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from rest_framework import viewsets
+from .serializers import CourseSerializer
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
 from website.models import Card, Box
@@ -18,6 +20,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
 import pdfkit
+
+
+class CardView(viewsets.ModelViewSet):
+    serializer_class = CardSerializer
+    queryset = Card.objects.all()
+
+class BoxView(viewsets.ModelViewSet):
+    serializer_class = CardSerializer
+    queryset = Box.objects.all()
 
 
 def home(request):
