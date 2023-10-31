@@ -3,7 +3,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 from django.urls import path, include
+from rest_framework import routers
 
+
+router = routers.DefaultRouter()
+router.register(r'cards', views.CardView, basename='card')
+router.register(r'boxes', views.BoxView, basename='box')
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -27,4 +32,5 @@ urlpatterns = [
     path('create_new_box/', views.create_new_box, name='create_new_box'),
     path('delete_box/<int:box_number>/', views.delete_box, name='delete_box'),
     path('get_available_boxes/', views.get_available_boxes, name='get_available_boxes'),
+    path('api/', include(router.urls)),
 ]
