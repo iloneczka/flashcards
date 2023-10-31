@@ -29,8 +29,8 @@
     <div class="form-group">
       <label for="box" class="form-label card-label">Box:</label>
       <select id="box" class="form-select card-input" name="box" required>
-        {% if unique_boxes %}
-          {% for box in unique_boxes %}
+        {% if users_boxes %}
+          {% for box in users_boxes %}
             <option value="{{ box.box_number }}">Box {{ box.box_number }}</option>
           {% endfor %}
         {% else %}

@@ -19,7 +19,7 @@
 <select class="form-select" id="box-select" aria-label="Select a box" name="box_number">
   <option selected value="all">All cards</option>
   <option disabled>──────────</option>
-  {% for box in unique_boxes %}
+  {% for box in users_boxes %}
     <option value="{{ box.box_number }}">Box {{ box.box_number }}</option>
   {% endfor %}
 </select>

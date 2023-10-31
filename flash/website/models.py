@@ -8,7 +8,7 @@ class Box(models.Model):
     box_number = models.IntegerField()
 
     @staticmethod
-    def get_unique_boxes(user):
+    def get_users_boxes(user):
         boxes_with_cards = Box.objects.filter(user=user).values('box_number').distinct()
         return boxes_with_cards
 

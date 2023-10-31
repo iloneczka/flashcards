@@ -46,14 +46,14 @@ def home(request):
         box.delete()
         return JsonResponse({'status': 'success'})
 
-    unique_boxes = Box.get_unique_boxes(request.user)
+    users_boxes = Box.get_users_boxes(request.user)
 
-    return render(request, 'home.html', {'unique_boxes': unique_boxes})
+    return render(request, 'home.html', {'users_boxes': users_boxes})
 
 
 @login_required
 def flashcard_program(request, box_number):
-    unique_boxes = Box.get_unique_boxes(request.user)
+    users_boxes = Box.get_users_boxes(request.user)
 
     if request.method == 'POST':
         box_number = request.POST.get('box_number')
@@ -71,17 +71,16 @@ def flashcard_program(request, box_number):
     context = {
         'box_number': box_number,
         'random_card': random_card,
-        'unique_boxes': unique_boxes,
+        'users_boxes': users_boxes,
         'no_cards': not random_card,
     }
 
     return render(request, 'flashcard_program.html', context)
 
 
+@login_required
 def create_new_box(request):
-    print("PRINTUJE 1 request:", request)
     if request.method == 'POST':
-        print("PRINTUJE 2 request.method:", request.method)
         user = request.user
 
         max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
@@ -91,16 +90,14 @@ def create_new_box(request):
         else:
             new_box_number = 1
 
-        print('Drukuje max_box_number', max_box_number)
-        print('Drukuje new_box_number', new_box_number)
-
         Box.objects.create(user=user, box_number=new_box_number)
-        unique_boxes = Box.get_unique_boxes(request.user)
+        users_boxes = Box.get_users_boxes(request.user)
 
-        return JsonResponse({'status': 'success', 'new_box_number': new_box_number, 'unique_boxes': list(unique_boxes)})
+        return JsonResponse({'status': 'success', 'new_box_number': new_box_number, 'users_boxes': list(users_boxes)})
     return JsonResponse({'status': 'error'})
 
 
+@login_required
 def delete_box(request, box_number):
     if request.method == 'POST':
         box = Box.objects.get(user=request.user, box_number=box_number)
@@ -111,39 +108,40 @@ def delete_box(request, box_number):
 
 @login_required
 def all_cards(request, box_number=None):
-    unique_boxes = Box.get_unique_boxes(request.user)
+    users_boxes = Box.get_users_boxes(request.user)
 
     if box_number is not None:
         box_number = int(box_number)  # Konwertuj na liczbę całkowitą
 
         if box_number != 0:
             cards = Card.objects.filter(user=request.user, box__box_number=box_number)
-            context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
+            context = {'cards': cards, 'users_boxes': users_boxes, 'box_number': box_number}
         else:
             cards = Card.objects.filter(user=request.user)
-            context = {'cards': cards, 'unique_boxes': unique_boxes}
+            context = {'cards': cards, 'users_boxes': users_boxes}
     else:
-        context = {'unique_boxes': unique_boxes}
+        context = {'users_boxes': users_boxes}
 
     return render(request, 'user_panel.html', context)
 
 
 @login_required
 def user_panel(request):
-    unique_boxes = Box.get_unique_boxes(request.user)
-    for box in unique_boxes:
+    users_boxes = Box.get_users_boxes(request.user)
+    for box in users_boxes:
         print(f"box: {box}")
         box['cards'] = Card.objects.filter(user=request.user, box__box_number=box.get('box_number'))
     # cards = Card.objects.filter(user=request.user)
 
-    # context = {'cards': cards, 'unique_boxes': unique_boxes}
-    # print(f"boxes hopefully with cards...: {unique_boxes}")
-    context = {'unique_boxes': unique_boxes}
+    # context = {'cards': cards, 'users_boxes': users_boxes}
+    # print(f"boxes hopefully with cards...: {users_boxes}")
+    context = {'users_boxes': users_boxes}
     print('context:', context)
 
     return render(request, 'user_panel.html', context)
 
 
+@login_required
 def edit_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
 
@@ -165,6 +163,7 @@ def edit_card(request, card_id):
     return render(request, 'edit_card.html', {'card': card})
 
 
+@login_required
 def move_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
 
@@ -189,12 +188,14 @@ def move_card(request, card_id):
     return JsonResponse({'status': 'error'})
 
 
+@login_required
 def get_available_boxes(request):
     user_boxes = Box.objects.filter(user=request.user)
     available_boxes = user_boxes.values_list('box_number', flat=True)
     return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
 
 
+@login_required
 def delete_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
     if request.method == 'POST':
@@ -206,13 +207,13 @@ def delete_card(request, card_id):
 
 @login_required
 def create_new_card(request):
-    unique_boxes = Box.objects.filter(user=request.user).values('box_number')
+    users_boxes = Box.objects.filter(user=request.user).values('box_number')
 
-    if not unique_boxes:  # Jeśli unique_boxes jest puste
+    if not users_boxes:  # Jeśli users_boxes jest puste
         # Utwórz nowe pudełko
         new_box = Box.objects.create(user=request.user, box_number=1)  # Możesz ustawić odpowiedni numer pudełka
         box_number = new_box.box_number
-        unique_boxes = [{'box_number': box_number}]
+        users_boxes = [{'box_number': box_number}]
 
     if request.method == 'POST':
         question = request.POST.get('question')
@@ -227,11 +228,12 @@ def create_new_card(request):
         else:
             return JsonResponse({'status': 'error'})
 
-    return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
+    return render(request, 'create_new_card.html', {'users_boxes': users_boxes})
 
 
+@login_required
 def export_cards(request):
-    unique_boxes = Box.get_unique_boxes(request.user)
+    users_boxes = Box.get_users_boxes(request.user)
 
     option = request.GET.get('option', None)
 
@@ -241,10 +243,11 @@ def export_cards(request):
     else:
         cards = Card.objects.filter(user=request.user)
 
-    context = {'cards': cards, 'unique_boxes': unique_boxes}
+    context = {'cards': cards, 'users_boxes': users_boxes}
     return render(request, 'export_cards.html', context)
 
 
+@login_required
 def export_to_excel(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')  # Zdekoduj
@@ -283,6 +286,7 @@ def export_to_excel(request):
         return response
 
 
+@login_required
 def export_to_csv(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -310,6 +314,7 @@ def export_to_csv(request):
         return response
 
 
+@login_required
 def export_to_pdf(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
@@ -358,6 +363,7 @@ def export_to_pdf(request):
         return response
 
 
+@login_required
 def print_table(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -386,6 +392,7 @@ def print_table(request):
         return response
 
 
+@login_required
 def update_rating_and_get_new_card(request):
     if request.method == 'POST' and request.is_ajax():
         try:
@@ -413,7 +420,6 @@ def update_rating_and_get_new_card(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-# signup page
 def user_signup(request):
     print("drukuje")
     if request.method == 'POST':

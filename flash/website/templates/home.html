@@ -52,7 +52,7 @@
   <div class="carousel-inner">
     <div class="item active">
         <div class="row">
-            {% for box in unique_boxes %}
+            {% for box in users_boxes %}
                 <div class="col-md-3" style="position: relative;">
                     <div class="thumbnail">
                         <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}"></a>
@@ -122,7 +122,7 @@
               console.log("Odpowiedź serwera na DATA:", data);
                 if (data.status === 'success') {
                     var newBoxNumber = data.new_box_number;
-                    var updatedBoxes = data.unique_boxes;
+                    var updatedBoxes = data.users_boxes;
 
                     if ('new_box_number' in data) {
                         var newBoxHtml = '...'; // Kod HTML dla nowego boxa

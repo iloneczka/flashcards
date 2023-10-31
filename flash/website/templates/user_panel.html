@@ -8,8 +8,8 @@
 <div class="row">
     <div class="col-4">
         <div id="list-example" class="list-group">
-            {% if unique_boxes %}
-                {% for box in unique_boxes %}
+            {% if users_boxes %}
+                {% for box in users_boxes %}
                     <a class="list-group-item list-group-item-action box-link {% if box.box_number == selected_box_number %}active{% endif %}" href="#" data-box-number="{{ box.box_number }}">
                         <div class="box-image">
                             <img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}" style="width: 25%;">
@@ -30,8 +30,8 @@
     </div>
     <div class="col-8">
         <div class="card-list">
-            {% if unique_boxes %}
-                {% for box in unique_boxes %}
+            {% if users_boxes %}
+                {% for box in users_boxes %}
                 <div class="box-section" data-box-number="{{ box.box_number }}" style="display: none;" id="box-{{ box.box_number }}">
                     <table class="table">
                         <tr>
