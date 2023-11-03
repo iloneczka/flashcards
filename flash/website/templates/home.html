@@ -3,63 +3,151 @@
 {% load static %}
 
 {% block 'content' %}
-  <style>
-    @media (max-width: 767px) {
-      /* Styl dla małych ekranów (telefony) */
-      .nav-link, .navbar-brand {
-        font-size: 15px;
-      }
+<style>
+  @media (max-width: 767px) {
+    .nav-link, .navbar-brand {
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+    .nav-link, .navbar-brand {
+      font-size: 15px;
     }
 
-    @media (min-width: 768px) and (max-width: 991px) {
-      /* Styl dla średnich ekranów (tablety w orientacji pionowej) */
-      .nav-link, .navbar-brand {
-        font-size: 15px;
-      }
-
-      .box-img {
-        margin: 0 5px; /* Lub dostosuj wartość według potrzeb */
-      }
+    .box-img {
+      margin: 0 5px;
     }
-  </style>
+  }
 
-  <br/>
-  <div class="welcome-section">
-      <h1 class="welcome-header" style="font-size: 25px;">Hello, {{ request.user.username }}!</h1
-        <h2>Welcome to the Flashcard Language Learning App!</h2>
-  </div>
-  <br/>
-  <br/>
-  <br/>
-  <div>
-    <h2 style="font-size: 20px;">Press Box to START:</h2>
-    <br/>
-    <div class="d-flex flex-wrap justify-content-start">
-      <a href="{% url 'flashcard_program' box_number=1 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_1.png' %}" alt="Box 1" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=2 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_2.png' %}" alt="Box 2" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=3 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_3.png' %}" alt="Box 3" class="box-img" style="width: 20%; height: auto;">
-      </a>
-      <a href="{% url 'flashcard_program' box_number=0 %}" role="button" class="m-0.5">
-          <img src="{% static 'images/box_0.png' %}" alt="All cards" class="box-img" style="width: 20%; height: auto;">
-      </a>
-  </div>
-  
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
-  <br/>
+  .thumbnail {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      /* Twój JavaScript */
+  .thumbnail img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .thumbnail .delete-button {
+    position: absolute;
+    bottom: -87px;
+    right: 60px;
+    transform: scale(0.50);
+  }
+</style>
+
+<br/>
+<div class="welcome-section">
+  <h1 class="welcome-header" style="font-size: 25px;">Hello, {{ request.user.username }}!</h1>
+  <h2>Welcome to the Flashcard Language Learning App!</h2>
+</div>
+<br/>
+<br/>
+<br/>
+<div class="carousel slide" id="myCarousel">
+  <div class="carousel-inner">
+    <div class="item active">
+        <div class="row">
+            {% for box in users_boxes %}
+                <div class="col-md-3" style="position: relative;">
+                    <div class="thumbnail">
+                        <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Box {{ box.box_number }}"></a>
+                        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                            <h4 style="margin: 0;">Box {{ box.box_number }}</h4>
+                            {% if forloop.last %}
+                                <form method="post" action="{% url 'delete_box' box.box_number %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm thumbnail delete-button">DELETE</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="caption text-center">
+                        <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=box.box_number %}">» START</a>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="col-md-3" style="position: relative;">
+                <div class="thumbnail">
+                    <a href="#"><img src="{% static 'images/szablon.png' %}" alt="Create New Box"></a>
+                    <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                        <h4 style="margin: 0;">Create New Box</h4>
+                    </div>
+                </div>
+                <div class="caption text-center">
+                    <form method="post" action="{% url 'create_new_box' %}">
+                        {% csrf_token %}
+                        <button type="submit" name="create_box" class="btn btn-mini btn-primary">CREATE NEW BOX</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-3" style="position: relative;">
+                <div class="thumbnail">
+                    <a href="#"><img src="{% static 'images/szablon.png' %}" alt="All cards"></a>
+                    <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+                        <h4 style="margin: 0;">All cards</h4>
+                    </div>
+                </div>
+                <div class="caption text-center">
+                    <a class="btn btn-mini btn-primary" href="{% url 'flashcard_program' box_number=0 %}">» START</a>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="control-box">
+    <a data-slide="prev" href="#myCarousel" class="carousel-control left">‹</a>
+    <a data-slide="next" href="#myCarousel" class="carousel-control right">›</a>
+  </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+ $(document).ready(function() {
+    $('.carousel').carousel({
+        interval: 5000
     });
-  </script>
+
+    $('form').submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        console.log("Przed Ajaxem jestem:");
+    console.log("Przed Ajaxem jestem:");
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            success: function(data) {
+              console.log("Odpowiedź serwera na DATA:", data);
+                if (data.status === 'success') {
+                    var newBoxNumber = data.new_box_number;
+                    var updatedBoxes = data.users_boxes;
+
+                    if ('new_box_number' in data) {
+                        var newBoxHtml = '...'; // Code HTML to new box
+
+                        $('#myCarousel .carousel-inner').append(newBoxHtml);
+                        $('#myCarousel .item').removeClass('active');
+                        $('#myCarousel .item:last-child').addClass('active');
+                    } else {
+                        // Box deletion was successful, remove the box from the carousel
+                        form.closest('.item').remove();
+                    }
+
+                    var boxListHtml = '';
+                    if (updatedBoxes) {
+                        updatedBoxes.forEach(function(box) {
+                            boxListHtml += '...'; // TODO
+                        });
+                    }
+
+                    $('.item.active .row').html(boxListHtml);
+                    window.location.reload(); 
+                }
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

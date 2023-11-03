@@ -20,11 +20,13 @@ The Flashcard Language Learning App is a web application designed to help users 
 
 ## Features
 
+- User registration and login functionality for individual users
 - Create and manage flashcards
-- Organize flashcards into different boxes
+- Organize flashcards into different dynamically created and deletable boxes
 - Practice with flashcards using the flashcard program
 - Export flashcards to various formats, including Excel, CSV, PDF, and HTML
 - Edit and delete flashcards
+- Moving flashcards between boxes in the User Panel
 - Print flashcards as a table
 
 ## Technologies Used
@@ -36,6 +38,8 @@ The Flashcard Language Learning App is a web application designed to help users 
 - HTML/CSS
 
 - JavaScript
+
+- Docker
 
 - Bootstrap (for styling)
 
@@ -110,6 +114,8 @@ XlsxWriter==3.1.2
 psycopg2-binary==2.9.6
 gunicorn==21.2.0
 flake8==6.0.0
+pdfkit==1.0.0
+djangorestframework==3.14.0
 ```
 ## Usage
 
@@ -148,11 +154,8 @@ The app employs a weighted randomization technique that adjusts the frequency of
 
 ## Future Plans
 
-- Implement user authentication at the beginning of the page (username and password) so that each user can have their own set of flashcards.
-- Change the current boxes to be dynamic, allowing users to add and customize their names.
 - Add the ability to import from CSV and Excel files, in addition to the existing export options.
 - Make design enhancements, including the addition of graphics, and ensure the layout is responsive for both computers and mobile devices.
-
 
 ## Inspirations and Acknowledgments
 
@@ -167,9 +170,3 @@ I drew inspiration from the following sources:
 - The course "Learn Python Driven Web Development With Django and Python!" on [Udemy](https://www.udemy.com) by John Elder
 
 - [Real Python's Django Flashcards App Tutorial](https://realpython.com/django-flashcards-app/#demo-your-django-flashcards-app)
-
-
-
-
-
-

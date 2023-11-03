@@ -5,37 +5,37 @@
   <br/>
   <br/>
   {% if added %}
-    <p class="card-info">Success!</p>
-    <p class="card-info">You added a new card:</p>
-    <p class="card-info">Front Card: <span class="question">{{ question }}</span></p>
-    <p class="card-info">Back Card: <span class="answer">{{ answer }}</span></p>
-    <br/>
-    <br/>
+  <p class="card-info">Success!</p>
+  <p class="card-info">You added a new card:</p>
+  <p class="card-info">Front Card: <span class="question">{{ new_card.question }}</span></p>
+  <p class="card-info">Back Card: <span class="answer">{{ new_card.answer }}</span></p>
+  <br/>
+  <br/>
   {% endif %}
+
   {% if user.is_authenticated %}
   <form action="{% url 'create_new_card' %}" method="POST">
     {% csrf_token %}
-    <script>
-      console.log("DRUKUJEIdentyfikator użytkownika: {{ user.id }}");
-    </script>
-      <input type="hidden" name="user" value="{{ user.id }}">
-    {% endif %}
     <div class="form-group">
       <label for="question" class="form-label card-label">Question:</label>
-      <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question">
+      <input type="text" class="form-control card-input" id="question" placeholder="Front Card" name="question" required>
     </div>
     <br/>
     <div class="form-group">
       <label for="answer" class="form-label card-label">Answer:</label>
-      <input type="text" class="form-control card-input" id="answer" placeholder="Back Card" name="answer">
+      <input type="text" class="form-control card-input" id="answer" placeholder="Back Card" name="answer" required>
     </div>
     <br/>
     <div class="form-group">
       <label for="box" class="form-label card-label">Box:</label>
-      <select id="box" class="form-select card-input" name="box">
-        <option value="box1">Box 1</option>
-        <option value="box2">Box 2</option>
-        <option value="box3">Box 3</option>
+      <select id="box" class="form-select card-input" name="box" required>
+        {% if users_boxes %}
+          {% for box in users_boxes %}
+            <option value="{{ box.box_number }}">Box {{ box.box_number }}</option>
+          {% endfor %}
+        {% else %}
+          <option value="1">Box 1</option>
+        {% endif %}
       </select>
     </div>
     <br/>
@@ -43,6 +43,17 @@
       <button class="btn btn-success card-button" type="submit">Add</button>
     </div>
   </form>
+{% endif %}
+
+  <script>
+    document.getElementById('add-new-card').addEventListener('click', function() {
+      document.getElementById('question').value = '';
+      document.getElementById('answer').value = '';
+      document.getElementById('box').selectedIndex = 0;
+    });
+  </script>
+
+
   <style type="text/css">
     .card-info {
       font-size: 15px;

@@ -8,9 +8,12 @@
   <br/>
   <br/>
   <br/>
-  
   {% if no_cards %}
-    <h1 style="font-size: 20px;"></h1>No cards available in this box.</h1>
+    <h1 style="font-size: 20px;">No cards available in this box. 
+    <form action="{% url 'create_new_card' %}" method="get" style="display:inline;">
+        <button type="submit" class="btn btn-success">Create New Card</button>
+    </form>
+    </h1>
   {% else %}
     <div class="row">
       <div class="col-md-12">

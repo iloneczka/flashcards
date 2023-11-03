@@ -2,19 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## Version 0.14 (2023.10.31)
+### Added
+- Integrated Django Rest Framework into the project by adding it to INSTALLED_APPS in settings.
+- Created a `serializers.py` file for data serialization.
+- Initial version of the API has been implemented.
+### Changed
+- Implemented `CardView` and `BoxView` as a `ModelViewSet` to handle API operations for the `Card` and `Box` model.
+- Integrated the API view with existing views in `views.py`.
+- Updated the `urls.py` file to include new API endpoints.
+
+## Version 0.13 (2023.10.17)
+### Edited
+- MOVE button
+### Added
+- Automated Box Creation in Case of No Existing Boxes When Creating the First Card
+
+## Version 0.12 (2023.10.13)
+### Edited
+- `all_cards.html` changed to `user_panel.html`
+### Added
+- in `user_panel`: Scrollspy List group of all boxes and its cards
+
+## Version 0.11 (2023.10.04)
+### Added
+- class Box in models
+### Edited
+- Updated `home.html` based on new `models.py`
+
 ## Version 0.10 (2023.09.23)
 ### Added
-- Added notifications for incorrect login and password attempts.
+
+Added notifications for incorrect login and password attempts.
 ### Edited
-- Updated `home.html`, the main template for selecting boxes.
-- Configured login and logout redirections
+Updated `home.html`, the main template for selecting boxes.
 
 ## version 0.9 (2023.09.21)
 ### Added
 - Register, Login and Logout options
 - Log Out button in main navbar
 ### Edited
-- home.html - Login overview
+- `home.html` - Login overview
 
 ## version 0.8 (2023.09.11)
 ### Edited
@@ -29,27 +58,27 @@ All notable changes to this project will be documented in this file.
 
 ## version 0.6 (2023.08.25)
 ### Deleted
-- cards_by_box.html 
-- flashcard_program_box.html
+- `cards_by_box.html`
+- `flashcard_program_box.html`
 ### Edited
-- Edit of models.py: update_rating and get_random_card_based_on_rating addes
+- Edit of `models.py`: update_rating and get_random_card_based_on_rating addes
 ### Added
 - New funcionality: program display card based on its weight
 
 
 ## version 0.5 (2023.08.24)
 ### Edited
-- home.html: start_button.png changed to box_1.png, box_2.png, box_3.png and all_cards.png
+- `home.html`: start_button.png changed to box_1.png, box_2.png, box_3.png and all_cards.png
 - All Cards changed to Cards in main navbar
 ### Added 
-- Edit of main navbar in base.html: navbarDropdown added to Cards (dropdown items: All Cards, Box <box.number> )
-- cards_by_box.html 
-- flashcard_program_box.html
+- Edit of main navbar in `base.html`: navbarDropdown added to Cards (dropdown items: All Cards, Box <box.number> )
+- `cards_by_box.html` 
+- `flashcard_program_box.html`
 
 
 ## version 0.4 (2023.08.23)
 ### Added 
-- Edit home.html: start_button.png starting the flashcards.program
+- Edit `home.html`: start_button.png starting the flashcards.program
 - Folder static
 
 
@@ -68,7 +97,7 @@ All notable changes to this project will be documented in this file.
 ## version 0.1 (2023.08.10)
 ### Added
 - class Card in models.py
-- new templates: all_cards.html, create_new_card.html, import_cards.html
+- new templates: `all_cards.html`, `create_new_card.html`, `import_cards.html`
 - basic structure for aplication
 
 

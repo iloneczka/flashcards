@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from rest_framework import viewsets
+from .serializers import CardSerializer, BoxSerializer
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
-from website.models import Card, BOXES
+from website.models import Card, Box
 import random
 import csv
 import xlsxwriter
@@ -16,88 +18,143 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import UserCreationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import models
+import pdfkit
+
+
+class CardView(viewsets.ModelViewSet):
+    serializer_class = CardSerializer
+    queryset = Card.objects.all()
+
+
+class BoxView(viewsets.ModelViewSet):
+    serializer_class = BoxSerializer
+    queryset = Box.objects.all()
 
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('login')  # Przekieruj użytkownika na stronę logowania
+        return redirect('login')
 
-    unique_boxes = Card.objects.values('box').distinct()
-    return render(request, 'home.html', {'unique_boxes': unique_boxes})
+    if request.method == 'POST' and 'create_box' in request.POST:
+        new_box = Box.create_new_box(request.user)
+        return JsonResponse({'status': 'success', 'new_box_number': new_box.box_number})
+
+    if request.method == 'POST' and 'delete_box' in request.POST:
+        box_id = request.POST.get('box_id')
+        box = get_object_or_404(Box, pk=box_id, user=request.user)
+        box.delete()
+        return JsonResponse({'status': 'success'})
+
+    users_boxes = Box.get_users_boxes(request.user)
+
+    return render(request, 'home.html', {'users_boxes': users_boxes})
 
 
 @login_required
 def flashcard_program(request, box_number):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
+    users_boxes = Box.get_users_boxes(request.user)
 
     if request.method == 'POST':
         box_number = request.POST.get('box_number')
 
-    all_cards = Card.objects.filter(user=request.user)
-
-    if box_number == '0':
-        cards = all_cards
+    if box_number == "0":
+        random_card = Card.objects.filter(user=request.user).order_by('?').first()
     else:
         try:
             box_number = int(box_number)
-            cards = all_cards.filter(box=box_number)
-        except ValueError:
-            cards = Card.objects.none()
-
-    random_card = cards.order_by('?').first()
+            cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+            random_card = cards.first()
+        except (ValueError, Card.DoesNotExist):
+            random_card = None
 
     context = {
         'box_number': box_number,
         'random_card': random_card,
-        'unique_boxes': unique_boxes,
+        'users_boxes': users_boxes,
+        'no_cards': not random_card,
     }
-
-    if not cards.exists():
-        context['no_cards'] = True
 
     return render(request, 'flashcard_program.html', context)
 
 
 @login_required
-def all_cards(request, box_number):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
+def create_new_box(request):
+    if request.method == 'POST':
+        user = request.user
 
-    if box_number != 0:
-        cards = Card.objects.filter(user=request.user, box=box_number)
-        context = {'cards': cards, 'unique_boxes': unique_boxes, 'box_number': box_number}
+        max_box_number = Box.objects.filter(user=user).aggregate(models.Max('box_number'))['box_number__max']
+
+        if max_box_number is not None:
+            new_box_number = max_box_number + 1
+        else:
+            new_box_number = 1
+
+        Box.objects.create(user=user, box_number=new_box_number)
+        users_boxes = Box.get_users_boxes(request.user)
+
+        return JsonResponse({'status': 'success', 'new_box_number': new_box_number, 'users_boxes': list(users_boxes)})
+    return JsonResponse({'status': 'error'})
+
+
+@login_required
+def delete_box(request, box_number):
+    if request.method == 'POST':
+        box = Box.objects.get(user=request.user, box_number=box_number)
+        box.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'})
+
+
+@login_required
+def all_cards(request, box_number=None):
+    users_boxes = Box.get_users_boxes(request.user)
+
+    if box_number is not None:
+        box_number = int(box_number)  # Konwertuj na liczbę całkowitą
+
+        if box_number != 0:
+            cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+            context = {'cards': cards, 'users_boxes': users_boxes, 'box_number': box_number}
+        else:
+            cards = Card.objects.filter(user=request.user)
+            context = {'cards': cards, 'users_boxes': users_boxes}
     else:
-        cards = Card.objects.filter(user=request.user)
-        context = {'cards': cards, 'unique_boxes': unique_boxes}
+        context = {'users_boxes': users_boxes}
 
-    return render(request, 'all_cards.html', context)
+    return render(request, 'user_panel.html', context)
 
 
+@login_required
+def user_panel(request):
+    users_boxes = Box.get_users_boxes(request.user)
+    for box in users_boxes:
+        print(f"box: {box}")
+        box['cards'] = Card.objects.filter(user=request.user, box__box_number=box.get('box_number'))
+    # cards = Card.objects.filter(user=request.user)
+
+    # context = {'cards': cards, 'users_boxes': users_boxes}
+    # print(f"boxes hopefully with cards...: {users_boxes}")
+    context = {'users_boxes': users_boxes}
+    print('context:', context)
+
+    return render(request, 'user_panel.html', context)
+
+
+@login_required
 def edit_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
 
     if request.method == 'POST':
-        print("Sprawdzam request", request.body)
-        body_unicode = request.body.decode('utf-8')  # Zdekoduj ten string, bez tego nie działało
+        body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
-        print('body_data', body_data)
 
         question = body_data.get('question')
-        print('question', question)
         answer = body_data.get('answer')
-        print(answer)
-        box_value = body_data.get('box', 'box1')
 
-        box_mapping = {
-            'box1': 1,
-            'box2': 2,
-            'box3': 3,
-        }
-        box = box_mapping.get(box_value, 1)
-
-        if question and answer and box in BOXES:
+        if question and answer:
             card.question = question
             card.answer = answer
-            card.box = box
             card.save()
             return JsonResponse({'status': 'success'})
         else:
@@ -106,6 +163,39 @@ def edit_card(request, card_id):
     return render(request, 'edit_card.html', {'card': card})
 
 
+@login_required
+def move_card(request, card_id):
+    card = get_object_or_404(Card, pk=card_id)
+
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        new_box_number = body_data.get('box_number')
+        print(request, "-request PRINTUJE")
+        print(new_box_number, "-new_box_number PRINTUJE")
+
+        user_boxes = Box.objects.filter(user=request.user)
+        available_boxes = user_boxes.values_list('box_number', flat=True)
+        print("available_boxes", list(available_boxes))
+        print("warunek", int(new_box_number) in list(available_boxes))
+        if int(new_box_number) in list(available_boxes):
+            card.box = user_boxes.get(box_number=new_box_number)
+            card.save()
+            return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
+        else:
+            return JsonResponse({'status': 'error', 'available_boxes': list(available_boxes)})
+
+    return JsonResponse({'status': 'error'})
+
+
+@login_required
+def get_available_boxes(request):
+    user_boxes = Box.objects.filter(user=request.user)
+    available_boxes = user_boxes.values_list('box_number', flat=True)
+    return JsonResponse({'status': 'success', 'available_boxes': list(available_boxes)})
+
+
+@login_required
 def delete_card(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
     if request.method == 'POST':
@@ -117,36 +207,47 @@ def delete_card(request, card_id):
 
 @login_required
 def create_new_card(request):
-    print("request", request)
-    unique_boxes = Card.objects.values('box').distinct()
-    print("unique bxes drukuje", unique_boxes)
+    users_boxes = Box.objects.filter(user=request.user).values('box_number')
+
+    if not users_boxes:  # Jeśli users_boxes jest puste
+        # Utwórz nowe pudełko
+        new_box = Box.objects.create(user=request.user, box_number=1)  # Możesz ustawić odpowiedni numer pudełka
+        box_number = new_box.box_number
+        users_boxes = [{'box_number': box_number}]
+
     if request.method == 'POST':
-        print("request", request)
         question = request.POST.get('question')
         answer = request.POST.get('answer')
-        box_value = request.POST.get('box', 'box1')
-        print("printuje: ", question, answer, box_value)
+        box_number = request.POST.get('box')
 
-        box_mapping = {
-            'box1': 1,
-            'box2': 2,
-            'box3': 3,
-        }
-        box = box_mapping.get(box_value, 1)
-
-        if request.user.is_authenticated:
-            user = request.user
-            print('DRUKUJE user:', user)
-            print("USER ID:", user.id)
-            Card.objects.create(user=user, question=question, answer=answer, box=box)
+        if question and answer and box_number:
+            box = get_object_or_404(Box, user=request.user, box_number=box_number)
+            new_card = Card.objects.create(user=request.user, question=question, answer=answer, box=box)
             added = True
-            return render(request, 'create_new_card.html', {'added': added, 'question': question, 'answer': answer, 'unique_boxes': unique_boxes})
+            return render(request, 'create_new_card.html', {'added': added, 'new_card': new_card})
         else:
-            pass
+            return JsonResponse({'status': 'error'})
 
-    return render(request, 'create_new_card.html', {'unique_boxes': unique_boxes})
+    return render(request, 'create_new_card.html', {'users_boxes': users_boxes})
 
 
+@login_required
+def export_cards(request):
+    users_boxes = Box.get_users_boxes(request.user)
+
+    option = request.GET.get('option', None)
+
+    if option is not None and option.isnumeric():
+        box_number = int(option)
+        cards = Card.objects.filter(user=request.user, box__box_number=box_number)
+    else:
+        cards = Card.objects.filter(user=request.user)
+
+    context = {'cards': cards, 'users_boxes': users_boxes}
+    return render(request, 'export_cards.html', context)
+
+
+@login_required
 def export_to_excel(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')  # Zdekoduj
@@ -159,7 +260,7 @@ def export_to_excel(request):
         if selected_box == 'all':
             all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
         # Tworzenie pliku Excel
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -185,18 +286,7 @@ def export_to_excel(request):
         return response
 
 
-def export_cards(request):
-    unique_boxes = Card.objects.filter(user=request.user).values('box').distinct()
-    all_cards = Card.objects.filter(user=request.user)
-
-    context = {
-        'unique_boxes': unique_boxes,
-        'all_cards': all_cards,
-    }
-
-    return render(request, 'export_cards.html', context)
-
-
+@login_required
 def export_to_csv(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -209,7 +299,7 @@ def export_to_csv(request):
         if selected_box == 'all':
             all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
         # Tworzenie pliku CSV
         response = HttpResponse(content_type='text/csv')
@@ -224,24 +314,29 @@ def export_to_csv(request):
         return response
 
 
+@login_required
 def export_to_pdf(request):
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
+        body_unicode = request.body.decode('utf-8')  # Decode byte string to unicode string
         body_data = json.loads(body_unicode)
         print('body_data', body_data)
 
         selected_box = body_data.get('selected_box')
-
+        print(request.POST)
+        print(selected_box)
+        # Pobierz dane kart z wybranego boxa lub wszystkie karty
         if selected_box == 'all':
             all_cards = Card.objects.filter(user=request.user)
         else:
-            all_cards = Card.objects.filter(box=selected_box, user=request.user)
+            all_cards = Card.objects.filter(user=request.user, box__box_number=int(selected_box))
 
+        # Create the PDF document
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
 
         doc = SimpleDocTemplate(response, pagesize=landscape(letter))
         data = [[card.question, card.answer] for card in all_cards]
+        print(data)
 
         # Create the table
         table = Table(data)
@@ -253,13 +348,14 @@ def export_to_pdf(request):
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust
-            ('RIGHTPADDING', (0, 1), (-1, -1), 10),
-            ('COLWIDTH', (0, 0), (-1, -1), 100),
+            ('LEFTPADDING', (0, 1), (-1, -1), 10),  # Adjust left padding for data cells
+            ('RIGHTPADDING', (0, 1), (-1, -1), 10),  # Adjust right padding for data cells
+            ('COLWIDTH', (0, 0), (-1, -1), 100),  # Adjust column width for all columns
         ])
 
         table.setStyle(style)
 
+        # Build the PDF
         elements = []
         elements.append(table)
         doc.build(elements)
@@ -267,6 +363,7 @@ def export_to_pdf(request):
         return response
 
 
+@login_required
 def print_table(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -285,28 +382,17 @@ def print_table(request):
         }
 
         template = get_template('print_template.html')
-        template.render(context)
+        rendered_template = template.render(context)  # Define rendered_template
 
-        buffer = BytesIO()
-
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-
-        # Prepare the PDF content, such as a table, using reportlab
-        elements = []
-        elements.append(Table([['Card', 'Answer']] + [[card.question, card.answer] for card in all_cards]))
-        doc.build(elements)
-
-        # Set HTTP response headers
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="cards.pdf"'
+        response['Content-Disposition'] = 'inline; filename="cards.pdf"'
 
-        # Save the PDF content to the HTTP response
-        buffer.seek(0)
-        response.write(buffer.read())
+        pdfkit.from_string(rendered_template, response)
 
         return response
 
 
+@login_required
 def update_rating_and_get_new_card(request):
     if request.method == 'POST' and request.is_ajax():
         try:
@@ -334,7 +420,6 @@ def update_rating_and_get_new_card(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-# signup page
 def user_signup(request):
     print("drukuje")
     if request.method == 'POST':

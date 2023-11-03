@@ -14,65 +14,63 @@
       font-size: 15px;   /* Przyciski*/
     }
   </style>
-  <!-- Lista rozwijana do wyboru boxa -->
-  <select class="form-select" id="box-select" aria-label="Select a box">
-    <option selected value="all">All cards</option>
-    <option disabled>──────────</option>
-    {% for box in unique_boxes %}
-      <option value="{{ box.box }}">Box {{ box.box }}</option>
+
+<!-- Lista rozwijana do wyboru boxa -->
+<select class="form-select" id="box-select" aria-label="Select a box" name="box_number">
+  <option selected value="all">All cards</option>
+  <option disabled>──────────</option>
+  {% for box in users_boxes %}
+    <option value="{{ box.box_number }}">Box {{ box.box_number }}</option>
+  {% endfor %}
+</select>
+
+<!-- Tabela -->
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Question</th>
+      <th scope="col">Answer</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for card in cards %}
+      <tr class="box-table" data-box="{{ card.box.box_number }}">
+        <td>{{ card.question }}</td>
+        <td>{{ card.answer }}</td>
+      </tr>
     {% endfor %}
-  </select>
+  </tbody>
+</table>
 
-  <!-- Tabela z kartami -->
-  <div class="card-tables">
-    {% for box in unique_boxes %}
-      <table class="table box-table" data-box="{{ box.box }}">
-        <thead>
-          <tr>
-            <th scope="col" class="box-header" colspan="2">Box {{ box.box }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for card in all_cards %}
-            {% if box.box == 'all' or card.box == box.box %}
-              <tr>
-                <td>{{ card.question }}</td>
-                <td>{{ card.answer }}</td>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endfor %}
-  </div>
+<div class="btn-success-container">
+  <button class="btn btn-success" id="export-pdf-button">Export to PDF</button>
+  <button class="btn btn-secondary" id="export-excel-button">Export to Excel</button>
+  <button class="btn btn-success" id="export-csv-button">Export to CSV</button>
+  <button class="btn btn-secondary" id="print-button">PRINT</button>
+</div>
 
-  <div class="btn-success-container">
-    <button class="btn btn-success" id="export-pdf-button">Export to PDF</button>
-    <button class="btn btn-secondary" id="export-excel-button">Export to Excel</button>
-    <button class="btn btn-success" id="export-csv-button">Export to CSV</button>
-    <button class="btn btn-secondary" id="print-button">PRINT<button>
-  </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const boxSelect = document.getElementById('box-select');
+  const cardTables = document.querySelectorAll('.box-table');
+  const exportPdfButton = document.getElementById('export-pdf-button');
+  const exportExcelButton = document.getElementById('export-excel-button'); 
+  const exportCsvButton = document.getElementById('export-csv-button');
+  const printButton = document.getElementById('print-button');
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const boxSelect = document.getElementById('box-select');
-    const boxTables = document.querySelectorAll('.box-table');
-    const exportPdfButton = document.getElementById('export-pdf-button');
-    const exportExcelButton = document.getElementById('export-excel-button'); 
-    const exportCsvButton = document.getElementById('export-csv-button');
-    const printButton = document.getElementById('print-button');
+  boxSelect.addEventListener('change', function () {
+  const selected_option = this.value;
 
-    boxSelect.addEventListener('change', () => {
-      const selectedBox = boxSelect.value;
-      boxTables.forEach((table) => {
-        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-          table.style.display = 'table';
-        } else {
-          table.style.display = 'none';
-        }
-      });
-    });
+  cardTables.forEach((table) => {
+    const boxNumber = table.dataset.box;
 
+    if (selected_option === 'all' || boxNumber === selected_option) {
+      table.style.removeProperty('display'); // Usunięcie display: zmianilo mi styl i ustawienie elementów tabeli.
+    } else {
+      table.style.display = 'none';
+    }
+  });
+});
     exportExcelButton.addEventListener('click', () => {
       const selectedBox = boxSelect.value; // Pobierz wybrany box
       const csrfToken = '{{ csrf_token }}'; // Pobierz token CSRF
@@ -159,14 +157,16 @@
     });
 
     printButton.addEventListener('click', () => {
-      const selectedBox = boxSelect.value;
-      boxTables.forEach((table) => {
-        if (selectedBox === 'all' || table.getAttribute('data-box') === selectedBox) {
-          table.style.display = 'table';
+    const selectedBox = boxSelect.value;
+    
+    cardTables.forEach((table) => {
+        const boxNumber = table.dataset.box;
+        if (selectedBox === 'all' || boxNumber === selectedBox) {
+            table.classList.add('print-show'); // Dodaj klasę 'print-show'
         } else {
-          table.style.display = 'none';
+            table.classList.remove('print-show'); // Usuń klasę 'print-show'
         }
-      });
+    });
       document.getElementById('box-select').style.display = 'none';
       document.querySelector('h1').style.display = 'none';
       exportPdfButton.style.display = 'none'; // Ukryj przyciski
@@ -194,7 +194,9 @@
       font-size: 25px;
       color: black;
     }  
-    
+    .table th, .table td {
+      width: 50px; /* lub inna stała szerokość, która pasuje do Twoich danych */
+    }     
     .question, .answer, .card-label, .card-input, .card-button {
       font-size: 25px;
     }
