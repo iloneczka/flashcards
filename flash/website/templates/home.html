@@ -125,7 +125,7 @@
                     var updatedBoxes = data.users_boxes;
 
                     if ('new_box_number' in data) {
-                        var newBoxHtml = '...'; // Kod HTML dla nowego boxa
+                        var newBoxHtml = '...'; // Code HTML to new box
 
                         $('#myCarousel .carousel-inner').append(newBoxHtml);
                         $('#myCarousel .item').removeClass('active');
@@ -138,7 +138,7 @@
                     var boxListHtml = '';
                     if (updatedBoxes) {
                         updatedBoxes.forEach(function(box) {
-                            boxListHtml += '...'; // Aktualizuj to z odpowiednim kodem HTML dla listy boxów
+                            boxListHtml += '...'; // TODO
                         });
                     }
 
