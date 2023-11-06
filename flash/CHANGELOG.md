@@ -2,6 +2,84 @@
 
 All notable changes to this project will be documented in this file.
 
+## Version 0.15 (2023.11.06)
+### Changed
+- MANUAL ACTION REQUIRED: migrations files renamed. Before running this version manual execute the following instructions:
+1. Stop running application.
+```linux
+docker-compose -f <composefile> down
+```
+Example:
+```linux
+docker-compose -f docker-compose.dev.yml down
+```
+2. Verify application is not running.
+```linux
+docker-compose  -f <composefile> ps
+```
+Example:
+```linux
+docker-compose  -f docker-compose.dev.yml ps
+```
+3. Run database container only.
+```linux
+docker-compose -f <composefile> up -d db
+```
+Example:
+```linux
+docker-compose -f docker-compose.dev.yml up -d db
+```
+4. Verify database container is running.
+```linux
+docker-compose  -f <composefile> ps
+```
+Example:
+```linux
+docker-compose  -f docker-compose.dev.yml ps
+```
+5. Enter database container.
+```linux
+docker exec -it <containername /bin/bash
+```
+Example:
+```linux
+docker exec -it flashcards-db-1 /bin/bash
+```
+6. Enter Djnango database.
+```
+psql --username=<django_username> --dbname=<django_database>
+```
+Example:
+```
+psql --username=hello_django --dbname=hello_django_dev
+```
+7. List applied migrations on application website.
+```sql
+SELECT * FROM django_migrations;
+```
+8. Execute following update statements.
+```sql
+UPDATE django_migrations SET name='0002_create_box_of_existing_cards' WHERE name='0002_box_alter_card_box';
+UPDATE django_migrations SET name='0003_combine_cards_and_remove_empty_boxes' WHERE name='0003_box_alter_card_box';
+UPDATE django_migrations SET name='0004_fix_empty_boxes' WHERE name='0004_box_alter_card_box';
+
+```
+9. List applied migrations on application website and verify them.
+```sql
+SELECT * FROM django_migrations;
+```
+10. Exit the database and the container.
+`q`, `ctrl + D`
+11. Stop database container.
+```linux
+docker-compose -f <composefile> down db
+```
+Example:
+```linux
+docker-compose -f docker-compose.dev.yml down db
+```
+12. Proceed with the installation of the new version.
+
 
 ## Version 0.14 (2023.10.31)
 ### Added

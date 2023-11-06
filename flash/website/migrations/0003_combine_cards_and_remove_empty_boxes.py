@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('website', '0002_box_alter_card_box'),
+        ('website', '0002_create_box_of_existing_cards'),
     ]
 
     operations = [
