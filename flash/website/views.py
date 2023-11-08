@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import viewsets
 from .serializers import CardSerializer, BoxSerializer
+from .api import CardView, BoxView
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template
 from website.models import Card, Box
@@ -20,16 +21,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
 import pdfkit
-
-
-class CardView(viewsets.ModelViewSet):
-    serializer_class = CardSerializer
-    queryset = Card.objects.all()
-
-
-class BoxView(viewsets.ModelViewSet):
-    serializer_class = BoxSerializer
-    queryset = Box.objects.all()
 
 
 def home(request):
@@ -210,8 +201,7 @@ def create_new_card(request):
     users_boxes = Box.objects.filter(user=request.user).values('box_number')
 
     if not users_boxes:  # Jeśli users_boxes jest puste
-        # Utwórz nowe pudełko
-        new_box = Box.objects.create(user=request.user, box_number=1)  # Możesz ustawić odpowiedni numer pudełka
+        new_box = Box.objects.create(user=request.user, box_number=1)
         box_number = new_box.box_number
         users_boxes = [{'box_number': box_number}]
 

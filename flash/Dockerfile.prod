@@ -49,7 +49,7 @@ WORKDIR $APP_HOME
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends netcat
 COPY --from=builder /usr/src/flash/wheels /wheels
-COPY --from=builder /usr/src/flash/requirements.txt .
+COPY --from=builder /usr/src/flash/website/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
