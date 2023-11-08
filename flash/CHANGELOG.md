@@ -76,7 +76,7 @@ docker-compose -f <composefile> down db
 ```
 Example:
 ```linux
-docker-compose -f docker-compose.dev.yml down db
+docker-compose -f docker-compose.dev.yml down
 ```
 12. Proceed with the installation of the new version.
 
