@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('website', '0003_box_alter_card_box'),
+        ('website', '0003_combine_cards_and_remove_empty_boxes'),
     ]
 
     operations = [
