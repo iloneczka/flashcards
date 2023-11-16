@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Version 0.16 (2023.11.16)
+###Added: 
+- user.html with basic user information, including the ability to generate a token and change the username.
+= Implemented User Token Authorization for API.
+
+## Version 0.16 (2023.11.08)
+### Added
+- api.py template - move all api code from views there
+
 ## Version 0.15 (2023.11.06)
 ### Changed
 - MANUAL ACTION REQUIRED: migrations files renamed. Before running this version manual execute the following instructions:

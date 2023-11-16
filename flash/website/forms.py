@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.forms import UserChangeForm
 
 
 class SignupForm(UserCreationForm):
@@ -25,3 +26,16 @@ class LoginForm(forms.Form):
             if not user or not user.is_active:
                 raise forms.ValidationError("Invalid username or password.")
         return cleaned_data
+
+
+class GenerateTokenForm(forms.Form):
+    generate_token = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        initial='Generate Token',
+    )
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta(UserChangeForm.Meta):
+        fields = ('username',)

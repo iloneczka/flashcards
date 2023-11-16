@@ -25,7 +25,7 @@ urlpatterns = [
     path('print_table/', views.print_table, name='print_table'),
     path('flashcards/<str:box_number>/', views.flashcard_program, name='flashcard_program'),
     path('update_rating_and_get_new_card/', views.update_rating_and_get_new_card, name='update_rating_and_get_new_card'),
-    path('registration/login/', views.user_login, name='login'),
+    # path('registration/login/', views.user_login, name='login'),
     path('registration/signup/', views.user_signup, name='signup'),
     path('logout/', views.user_logout, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
@@ -33,4 +33,7 @@ urlpatterns = [
     path('delete_box/<int:box_number>/', views.delete_box, name='delete_box'),
     path('get_available_boxes/', views.get_available_boxes, name='get_available_boxes'),
     path('api/', include(router.urls)),
+    path('user/', views.user_profile, name='user_profile'),
+    path('generate_token/', views.generate_token, name='generate_token'),
+    path('change_username/', views.change_username, name='change_username'),
 ]

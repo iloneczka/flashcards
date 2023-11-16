@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+  <h1 style="font-size: 25px;">{{ user.username }}</h1>
+
+
+  <br>
+  <div class="list-group-item border-top"></div>
+  <ul style="list-style-type: none; padding: 0;">
+    <li><strong>User Name:</strong> {{ user.username }}</li>
+
+    <button id="change-username-btn" class="btn btn-primary">Change Username</button>
+    <form id="change-username-form" method="post" action="{% url 'user_profile' %}" style="display: none;">
+        {% csrf_token %}
+
+        <label for="id_username">Current User Name:</label>
+        {{ user_change_form.username }}
+        
+        <label for="id_new_username">New User Name:</label>
+        <input type="text" name="new_username" id="id_new_username" required>
+
+        <button type="submit" name="action" value="change_username" class="btn btn-primary">Save</button>
+    </form>
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+    <li><strong>User ID:</strong> {{ user.id }}</li>
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+    <li><strong>Registration Date:</strong> {{ user.date_joined }}</li>
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+    <li><strong>Last Login Date:</strong> {{ user.last_login }}</li>
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+    <li><strong>Number of Cards and Boxes:</strong> Cards: {{ user.card_set.count }} Boxes: {{ user.box_set.count }}</li>
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+    <li><strong>Token:</strong></li>
+    <form method="post" action="{% url 'user_profile' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ generate_token_form.as_p }}
+        <button type="submit" name="action" value="generate_token" class="btn btn-primary">Generate Token</button>
+    </form>
+
+    {% if generated_token %}
+        <p style="margin-top: 20px;"><strong>Your Token:</strong> {{ generated_token.key }}</p>
+    {% endif %}
+    <br>
+    <div class="list-group-item border-top"></div>
+    <br>
+  </ul>
+
+  <script>
+    document.getElementById('change-username-btn').addEventListener('click', function() {
+        var form = document.getElementById('change-username-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+  </script>
+{% endblock %}

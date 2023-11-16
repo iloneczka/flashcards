@@ -21,6 +21,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
 import pdfkit
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
+from .forms import GenerateTokenForm
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import update_session_auth_hash
+from .forms import CustomUserChangeForm
+from django.contrib.auth.models import User
 
 
 def home(request):
@@ -118,6 +126,9 @@ def all_cards(request, box_number=None):
 
 @login_required
 def user_panel(request):
+    # token = Token.objects.create(user=request.user)
+    # print(f"NEW USER TOKEN CREATED FOR USER {request.user}: {token.key}")
+
     users_boxes = Box.get_users_boxes(request.user)
     for box in users_boxes:
         print(f"box: {box}")
@@ -424,25 +435,77 @@ def user_signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-def user_login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user:
-                login(request, user)
-                messages.success(request, f'Welcome, {username}!')
-                print('zalogowałem:', user)
-                return redirect('home')
-            else:
-                messages.error(request, 'Invalid username or password.')
-    else:
-        form = LoginForm()
-    return render(request, 'registration/login.html', {'form': form})
+# def user_login(request):
+#     print('Trafiam do user_login')
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data['username']
+#             password = form.cleaned_data['password']
+#             user = authenticate(request, username=username, password=password)
+#             if user:
+#                 login(request, user)
+
+#                 # Tworzę token!!!
+#                 token, created = Token.objects.get_or_create(user=user)
+#                 print(token)
+
+#                 messages.success(request, f'Welcome, {username}!')
+#                 print('zalogowałem:', user)
+#                 return redirect('home')
+#             else:
+#                 messages.error(request, 'Invalid username or password.')
+#     else:
+#         form = LoginForm()
+#     return render(request, 'registration/login.html', {'form': form})
 
 
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+
+def generate_token(request):
+    user = request.user
+    token, created = Token.objects.get_or_create(user=user)
+
+    if not created:
+        token.delete()
+        token = Token.objects.create(user=user)
+
+    return token
+
+
+def change_username(request, new_username):
+    user = get_object_or_404(User, pk=request.user.pk)
+    user.username = new_username
+    user.save()
+    update_session_auth_hash(request, user)
+    return user
+
+
+@login_required
+def user_profile(request):
+    generated_token = None
+    user_change_form = CustomUserChangeForm(instance=request.user)
+    generate_token_form = GenerateTokenForm()
+
+    if request.method == 'POST':
+        if 'generate_token' in request.POST:
+            generate_token_form = GenerateTokenForm(request.POST)
+            if generate_token_form.is_valid():
+                generated_token = generate_token(request)
+                return render(request, 'user.html', {'generated_token': generated_token, 'user_change_form': user_change_form, 'generate_token_form': generate_token_form})
+        print("request.POST", request.POST)
+        if 'change_username' in request.POST.get('action'):
+            print("POST pierwszy:", request)
+            user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
+            if user_change_form.is_valid():
+                new_username = request.POST.get('new_username')
+                print("NEW USER NAME:", new_username)
+                user = change_username(request, new_username)
+                return redirect('user_profile')
+
+    return render(request, 'user.html', {'generated_token': generated_token, 'user_change_form': user_change_form, 'generate_token_form': generate_token_form})
+
+

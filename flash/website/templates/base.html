@@ -48,7 +48,7 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="nav-link">{{ user.username }}</span>
+                            <a class="nav-link" href="{% url 'user_profile' %}">{{ user.username }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-danger" href="{% url 'logout' %}">Log Out</a>
