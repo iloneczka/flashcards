@@ -23,7 +23,7 @@ COPY . /usr/src/flash/
 RUN flake8 --ignore=E501,F401 .
 
 # install python dependencies
-COPY ./flash/website/requirements.txt .
+COPY ./website/requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/flash/wheels -r requirements.txt
 
 
