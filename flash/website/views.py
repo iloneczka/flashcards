@@ -504,8 +504,7 @@ def user_profile(request):
                 new_username = request.POST.get('new_username')
                 print("NEW USER NAME:", new_username)
                 user = change_username(request, new_username)
+                print(user)
                 return redirect('user_profile')
 
     return render(request, 'user.html', {'generated_token': generated_token, 'user_change_form': user_change_form, 'generate_token_form': generate_token_form})
-
-
